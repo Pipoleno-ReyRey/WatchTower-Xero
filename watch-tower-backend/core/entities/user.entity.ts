@@ -1,10 +1,15 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { RoleUserEntity } from "./role-user.entity";
+import { PoliciesUserEntity } from "./policies-user.entity";
 
 @Entity("users")
 export class UserEntity {
-    @PrimaryGeneratedColumn()
+    
+    @PrimaryGeneratedColumn({name: "id"})
     id!: number;
+
+    @Column({name: "name", type: "varchar", length: 255, nullable: false, unique: false})
+    name!: string;
 
     @Column({name: "user_name", type: "varchar", length: 50, nullable: false, unique: true})
     userName!: string;
@@ -14,7 +19,16 @@ export class UserEntity {
 
     @Column({name: "password_hash", type: "text", nullable: false})
     password!: string;
+
+    @Column({name: "pin", type: "varchar", length: 6, nullable: false})
+    pin!: string;
     
+    @Column({name: "security_question", type: "varchar", length: 255, nullable: true})
+    securityQuestion!: string;
+
+    @Column({name: "security_answer", type: "varchar", length: 255, nullable: true})
+    securityAnswer!: string;
+
     @Column({name: "created_at", type: "timestamp", default: () => "CURRENT_TIMESTAMP", nullable: false})
     createdAt!: Date;
 
@@ -28,5 +42,11 @@ export class UserEntity {
     lastDateLogin!: Date;
 
     @OneToMany(() => RoleUserEntity, roleUser => roleUser.user)
+    @JoinColumn({name: "user_name"})
     roles!: RoleUserEntity[];
+
+    @OneToMany(() => PoliciesUserEntity, policiesUser => policiesUser.user)
+    @JoinColumn({name: "user_name"})
+    policies!: PoliciesUserEntity[];
+
 }
