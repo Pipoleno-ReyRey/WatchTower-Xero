@@ -1,12 +1,17 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Patch, Post } from '@nestjs/common';
 import { UserServiceService } from './user-service.service';
 
-@Controller()
+@Controller("user")
 export class UserServiceController {
   constructor(private readonly userServiceService: UserServiceService) {}
 
-  @Get()
-  getHello(): string {
-    return this.userServiceService.getHello();
+  @Post("/login")
+  async login() {
+    return "Login endpoint";
+  }
+
+  @Patch("/change-password")
+  async changePassword() {
+    return "Change password endpoint";
   }
 }
