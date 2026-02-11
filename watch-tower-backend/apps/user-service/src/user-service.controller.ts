@@ -14,4 +14,9 @@ export class UserServiceController {
   async changePassword() {
     return "Change password endpoint";
   }
+
+  @Post("/sign")
+  async signUp() {
+    return "Sign up endpoint";
+  }
 }

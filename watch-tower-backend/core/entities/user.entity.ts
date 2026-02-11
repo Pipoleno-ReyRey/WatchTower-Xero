@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { RoleUserEntity } from "./role-user.entity";
 import { PoliciesUserEntity } from "./policies-user.entity";
+import { DocumentEntity } from "./document.entity";
 
 @Entity("users")
 export class UserEntity {
@@ -48,5 +49,9 @@ export class UserEntity {
     @OneToMany(() => PoliciesUserEntity, policiesUser => policiesUser.user)
     @JoinColumn({name: "user_name"})
     policies!: PoliciesUserEntity[];
+
+    @OneToMany(() => DocumentEntity, document => document.user)
+    @JoinColumn({name: "user_name"})
+    documents!: DocumentEntity[];
 
 }
