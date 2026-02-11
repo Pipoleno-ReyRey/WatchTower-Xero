@@ -13,7 +13,7 @@ import { entitiesDb } from 'core/envs/db-entities.env';
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     entities: entitiesDb
-  })],
+  }), TypeOrmModule.forFeature(entitiesDb)],
   controllers: [UserServiceController],
   providers: [UserServiceService],
 })
