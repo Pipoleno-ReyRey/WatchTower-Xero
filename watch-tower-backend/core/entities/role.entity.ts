@@ -14,7 +14,6 @@ export class RoleEntity {
     description!: string;
 
     @OneToMany(() => RoleUserEntity, roleUser => roleUser.role)
-    @Column({name: "id", type: "int", nullable: false})
     @JoinColumn({name: "id", referencedColumnName: "role"})
-    users!: RoleUserEntity[];
+    users?: RoleUserEntity[];
 }

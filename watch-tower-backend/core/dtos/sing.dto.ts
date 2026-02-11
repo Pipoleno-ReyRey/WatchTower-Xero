@@ -4,6 +4,8 @@ export class signUp{
     email!: string;
     password!: string;
     pin!: string;
+    roles!: string[];
+    policies!: string[];
     securityQuestion?: string;
     securityAnswer?: string;
 }

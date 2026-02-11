@@ -25,10 +25,10 @@ export class UserEntity {
     pin!: string;
     
     @Column({name: "security_question", type: "varchar", length: 255, nullable: true})
-    securityQuestion!: string;
+    securityQuestion?: string;
 
     @Column({name: "security_answer", type: "varchar", length: 255, nullable: true})
-    securityAnswer!: string;
+    securityAnswer?: string;
 
     @Column({name: "created_at", type: "timestamp", default: () => "CURRENT_TIMESTAMP", nullable: false})
     createdAt!: Date;
@@ -52,6 +52,6 @@ export class UserEntity {
 
     @OneToMany(() => DocumentEntity, document => document.user)
     @JoinColumn({name: "user_name"})
-    documents!: DocumentEntity[];
+    documents?: DocumentEntity[];
 
 }
