@@ -36,7 +36,7 @@ export class UserServiceService {
           email: user.email,
           role: user.roles.map(r => r.role.role),
           policies: user.policies.map(p => p.policy.name),
-          documents: user.documents.map(d => d.title)
+          documents: user.documents?.map(d => d.title) || []
         }
         return userDto;
       }
@@ -70,6 +70,13 @@ export class UserServiceService {
 
       await this.roleUserRepository.save(roleUserEntities);
     
+      return {
+        userName: user.userName,
+        email: user.email,
+        role: singUp.roles,
+        policies: singUp.policies,
+        documents: []
+      }
     }
 
   }
