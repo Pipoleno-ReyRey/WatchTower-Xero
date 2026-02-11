@@ -22,6 +22,6 @@ export class AuditLogEntity {
     @Column({name: "action", type: "varchar", length: 255, nullable: false})
     action!: string;
 
-    @Column({name: "timestamp", type: "timestamp", default: () => "CURRENT_TIMESTAMP", nullable: false})
-    timestamp!: Date;
+    @Column({name: "date", type: "timestamp", default: () => "CURRENT_TIMESTAMP", nullable: false})
+    date!: Date;
 } 
