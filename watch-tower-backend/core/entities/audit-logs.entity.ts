@@ -10,14 +10,18 @@ export class AuditLogEntity {
     id!: number;
 
     @Column({name: "user_name", type: "varchar", length: 50, nullable: false})
-    @OneToOne(() => UserEntity, user => user.userName)
-    @JoinColumn({referencedColumnName: "user_name"})
     userName!: string;
 
+    @OneToOne(() => UserEntity, user => user.userName)
+    @JoinColumn({referencedColumnName: "user_name"})
+    user!: UserEntity;
+
     @Column({name: "session", type: "int", nullable: false})
+    sessionId!: number;
+
     @OneToOne(() => SessionEntity, session => session.id)
     @JoinColumn({referencedColumnName: "id"})
-    sessionId!: number;
+    session!: SessionEntity;
 
     @Column({name: "action", type: "varchar", length: 255, nullable: false})
     action!: string;

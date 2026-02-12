@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { RoleUserEntity } from "./role-user.entity";
 import { PoliciesUserEntity } from "./policies-user.entity";
+import { DocumentEntity } from "./document.entity";
 
 @Entity("users")
 export class UserEntity {
@@ -24,10 +25,10 @@ export class UserEntity {
     pin!: string;
     
     @Column({name: "security_question", type: "varchar", length: 255, nullable: true})
-    securityQuestion!: string;
+    securityQuestion?: string;
 
     @Column({name: "security_answer", type: "varchar", length: 255, nullable: true})
-    securityAnswer!: string;
+    securityAnswer?: string;
 
     @Column({name: "created_at", type: "timestamp", default: () => "CURRENT_TIMESTAMP", nullable: false})
     createdAt!: Date;
@@ -48,5 +49,9 @@ export class UserEntity {
     @OneToMany(() => PoliciesUserEntity, policiesUser => policiesUser.user)
     @JoinColumn({name: "user_name"})
     policies!: PoliciesUserEntity[];
+
+    @OneToMany(() => DocumentEntity, document => document.user)
+    @JoinColumn({name: "user_name"})
+    documents?: DocumentEntity[];
 
 }
