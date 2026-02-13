@@ -10,7 +10,7 @@ import bcrypt from 'node_modules/bcryptjs';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export class UserServiceService {
+export class UserService {
   constructor(
     @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
     @InjectRepository(RoleUserEntity) private roleUserRepository: Repository<RoleUserEntity>,
@@ -49,29 +49,6 @@ export class UserServiceService {
     await this.roleUserRepository.save(rolesUsers);
 
     return user as UserDto
-  }
-
-  //     await this.roleUserRepository.save(roleUserEntities);
-
-  //     return {
-  //       userName: user.userName,
-  //       email: user.email,
-  //       role: singUp.roles,
-  //       policies: singUp.policies,
-  //       documents: []
-  //     }
-  //   }
-
-  async getRoles() {
-    return this.roleRepository.createQueryBuilder()
-      .select()
-      .getMany()
-  }
-
-  async getUsers() {
-    return this.userRepository.createQueryBuilder()
-      .select()
-      .getMany()
   }
 
   async getUser(user: LoginDto): Promise<UserDto | string> {

@@ -1,14 +1,14 @@
-import { Body, Controller, Get, HttpStatus, Param, Patch, Post } from '@nestjs/common';
-import { UserServiceService } from './user-service.service';
+import { Body, Controller, Get, HttpStatus, Patch, Post } from '@nestjs/common';
+import { UserService } from './user-service.service';
 import { LoginDto } from 'core/dtos/login.dto';
 
 @Controller("user")
 export class UserServiceController {
-  constructor(private readonly userServiceService: UserServiceService) {}
+  constructor(private readonly userService: UserService) {}
 
   @Post("/login-user-validation")
   async loginUser(@Body("login") login: LoginDto) {
-    let response = await this.userServiceService.getUser(login);
+    let response = await this.userService.getUser(login);
     if(typeof(response) != "string"){
       return response;
     } else {
@@ -28,11 +28,6 @@ export class UserServiceController {
   @Post("/sign-in-user")
   async signUp() {
     return "Sign up endpoint";
-  }
-
-  @Get("/roles")
-  async roles(){
-    return await this.userServiceService.getRoles();
   }
 
 }

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UserServiceController } from './user-service.controller';
-import { UserServiceService } from './user-service.service';
+import { UserService } from './user-service.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { entitiesDb } from 'core/envs/db-entities.env';
@@ -19,6 +19,6 @@ import { entitiesDb } from 'core/envs/db-entities.env';
   }),
   TypeOrmModule.forFeature([...entitiesDb])],
   controllers: [UserServiceController],
-  providers: [UserServiceService],
+  providers: [UserService],
 })
 export class UserServiceModule { }
