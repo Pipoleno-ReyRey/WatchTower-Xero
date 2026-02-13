@@ -2,14 +2,8 @@ import { Module } from '@nestjs/common';
 import { UserServiceController } from './user-service.controller';
 import { UserServiceService } from './user-service.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuditLogEntity } from "core/entities/audit-logs.entity";
-import { PoliciesUserEntity } from "core/entities/policies-user.entity";
-import { PolicyEntity } from "core/entities/policies.entity";
-import { RoleUserEntity } from "core/entities/role-user.entity";
-import { RoleEntity } from "core/entities/role.entity";
-import { SessionEntity } from "core/entities/sessions.entity";
-import { UserEntity } from "core/entities/user.entity";
 import { ConfigModule } from '@nestjs/config';
+import { entitiesDb } from 'core/envs/db-entities.env';
 
 @Module({
   imports: [
@@ -21,9 +15,9 @@ import { ConfigModule } from '@nestjs/config';
     username: process.env.DB_USER || "postgres",
     password: process.env.DB_PASSWORD || "password",
     database: process.env.DB_NAME || "watchtower",
-    entities: [RoleEntity, UserEntity, RoleUserEntity],
+    entities: [...entitiesDb],
   }),
-  TypeOrmModule.forFeature([RoleEntity,UserEntity, RoleUserEntity])],
+  TypeOrmModule.forFeature([...entitiesDb])],
   controllers: [UserServiceController],
   providers: [UserServiceService],
 })

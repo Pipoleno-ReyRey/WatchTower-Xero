@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LoginDto } from 'core/dtos/login.dto';
-import { signUp } from 'core/dtos/sing.dto';
+import { roleDto } from 'core/dtos/role.dto';
+import { signIn, signUp } from 'core/dtos/sing.dto';
 import { UserDto } from 'core/dtos/user.dto';
 import { DocumentEntity } from 'core/entities/document.entity';
 import { PoliciesUserEntity } from 'core/entities/policies-user.entity';
@@ -43,31 +44,40 @@ export class UserServiceService {
   //     }
   //   }
 
-  //   async createUser(singUp: signUp): Promise<UserDto> {
-  //     const user = new UserEntity();
-  //     user.name = singUp.name;
-  //     user.userName = singUp.userName;
-  //     user.email = singUp.email;
-  //     user.password = singUp.password;
-  //     user.pin = singUp.pin;
-  //     user.securityQuestion = singUp.securityQuestion;
-  //     user.securityAnswer = singUp.securityAnswer;
-  //     user.email = singUp.email;
-  //     await this.userRepository.save(user);
-    
-  //     let roles = await this.roleRepository.createQueryBuilder("role")
-  //     .select([
-  //       "role.id as id",
-  //     ])
-  //     .where("role.role IN (:...roles)", { roles: singUp.roles })
-  //     .getRawMany();
-      
-  //     const roleUserEntities = roles.map((role) => {
-  //       const roleUserEntity = new RoleUserEntity();
-  //       roleUserEntity.user = user;
-  //       roleUserEntity.role = role;
-  //       return roleUserEntity;
-  //     });
+    async createUser(singIn: signIn): Promise<UserDto> {
+      const user = new UserEntity();
+      user.name = singIn.name;
+      user.userName = singIn.userName;
+      user.email = singIn.email;
+      user.password = singIn.password;
+      user.pin = singIn.pin;
+      user.securityQuestion = singIn.securityQuestion;
+      user.securityAnswer = singIn.securityAnswer;
+      user.email = singIn.email;
+
+      let rolesId = singIn.roles.map(role => {
+        return role.id
+      })
+
+      let roles = await this.roleRepository.createQueryBuilder()
+      .select()
+      .where("id IN(...:id))", { id: rolesId})
+      .getMany();
+
+      let rolesUsers = roles.map(role => {
+        let data = new RoleUserEntity();
+        data.user = user.userName;
+        data.role = role;
+
+        return data;
+      })
+
+      await this.roleUserRepository.save(rolesUsers);
+
+      return await this.userRepository.save(user) as UserDto;
+
+
+    }
 
   //     await this.roleUserRepository.save(roleUserEntities);
     
@@ -92,7 +102,7 @@ export class UserServiceService {
       .getMany()
     }
 
-    async getUser(user: LoginDto){
+    async getUser(user: LoginDto): Promise<UserDto>{
       let login: UserEntity | null = await this.userRepository.createQueryBuilder("uu")
       .innerJoinAndSelect("uu.roles", "roles")
       .select()
@@ -102,11 +112,6 @@ export class UserServiceService {
       .andWhere("uu.pin = :pin", {pin: user.pin})
       .getOne();
 
-      let response: UserDto = {
-        userName: login?.userName,
-        role: login?.roles,
-      }
-
-      return response;
+      return login as UserDto;
     }
   }

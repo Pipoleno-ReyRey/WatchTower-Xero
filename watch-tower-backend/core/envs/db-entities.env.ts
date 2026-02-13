@@ -10,10 +10,5 @@ import { UserEntity } from "core/entities/user.entity";
 export const entitiesDb = [
     UserEntity,
     RoleEntity,
-    AuditLogEntity,
-    PoliciesUserEntity,
-    PolicyEntity,
-    RoleUserEntity,
-    SessionEntity,
-    DocumentEntity
+    RoleUserEntity
 ]
