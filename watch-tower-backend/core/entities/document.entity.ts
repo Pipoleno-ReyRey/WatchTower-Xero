@@ -15,12 +15,9 @@ export class DocumentEntity {
     @Column({name: "created_at", type: "timestamp", default: () => "CURRENT_TIMESTAMP"})
     createdAt!: Date;
 
-    @Column({name: "user", type: "varchar", nullable: false})
-    userName!: string;
-
-    @ManyToOne(() => UserEntity, user => user.documents)
-    @JoinColumn({name: "user", referencedColumnName: "user_name"})
-    user!: UserEntity;
+    // @ManyToOne(() => UserEntity, user => user.documents)
+    // @JoinColumn({name: "user", referencedColumnName: "user_name"})
+    // user!: UserEntity;
 
     @Column({name: "password", type: "varchar", nullable: true})
     password!: string;

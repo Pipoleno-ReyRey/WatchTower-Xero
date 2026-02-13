@@ -1,14 +1,16 @@
-import { Column, Entity, JoinColumn, ManyToMany, ManyToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, PrimaryColumn } from "typeorm";
 import { UserEntity } from "./user.entity";
 import { RoleEntity } from "./role.entity";
 
-@Entity("role_user")
+@Entity("user_roles")
 export class RoleUserEntity {
-    @ManyToOne(() => UserEntity, user => user.roles)
-    @JoinColumn({name: "user", referencedColumnName: "user_name"})
-    user!: UserEntity;
+    @PrimaryColumn()
+    @ManyToOne(() => UserEntity, user => user.userName)
+    @JoinColumn({name: "user", referencedColumnName: "userName"})
+    user!: string;
 
-    @ManyToOne(() => RoleEntity, role => role.users)
+    @PrimaryColumn()
+    @ManyToOne(() => RoleEntity, role => role.role)
     @JoinColumn({name: "role", referencedColumnName: "id"})
     role!: RoleEntity;
 }

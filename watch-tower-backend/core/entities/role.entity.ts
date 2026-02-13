@@ -7,7 +7,7 @@ export class RoleEntity {
     @PrimaryGeneratedColumn({name: "id"})
     id!: number;
 
-    @Column({name: "name", type: "varchar", length: 100, nullable: false, unique: true})
+    @Column({name: "role", type: "varchar", length: 100, nullable: false, unique: true})
     role!: string;
 
     @Column({name: "description", type: "text", nullable: true})

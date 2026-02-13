@@ -18,7 +18,7 @@ export class UserEntity {
     @Column({name: "email", type: "varchar", length: 100, nullable: false, unique: true})
     email!: string;
 
-    @Column({name: "password_hash", type: "text", nullable: false})
+    @Column({name: "password", type: "text", nullable: false})
     password!: string;
 
     @Column({name: "pin", type: "varchar", length: 6, nullable: false})
@@ -46,12 +46,12 @@ export class UserEntity {
     @JoinColumn({name: "user_name"})
     roles!: RoleUserEntity[];
 
-    @OneToMany(() => PoliciesUserEntity, policiesUser => policiesUser.user)
-    @JoinColumn({name: "user_name"})
-    policies!: PoliciesUserEntity[];
+    // @OneToMany(() => PoliciesUserEntity, policiesUser => policiesUser.user)
+    // @JoinColumn({name: "user_name"})
+    // policies!: PoliciesUserEntity[];
 
-    @OneToMany(() => DocumentEntity, document => document.user)
-    @JoinColumn({name: "user_name"})
-    documents?: DocumentEntity[];
+    // @OneToMany(() => DocumentEntity, document => document.user)
+    // @JoinColumn({name: "user_name"})
+    // documents?: DocumentEntity[];
 
 }
