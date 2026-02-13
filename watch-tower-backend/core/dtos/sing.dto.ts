@@ -7,7 +7,7 @@ export class signIn{
     email!: string;
     password!: string;
     pin!: string;
-    roles?: roleDto[];
+    roles!: roleDto[];
     policies!: string[];
     securityQuestion?: string;
     securityAnswer?: string;
