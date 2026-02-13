@@ -1,15 +1,23 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, Patch, Post } from '@nestjs/common';
 import { UserServiceService } from './user-service.service';
 import { LoginDto } from 'core/dtos/login.dto';
-import { UserDto } from 'core/dtos/user.dto';
 
 @Controller("user")
 export class UserServiceController {
   constructor(private readonly userServiceService: UserServiceService) {}
 
   @Post("/login-user-validation")
-  async loginUser(@Body("login") login: LoginDto): Promise<UserDto> {
-    return await this.userServiceService.getUser(login);
+  async loginUser(@Body("login") login: LoginDto) {
+    let response = await this.userServiceService.getUser(login);
+    if(typeof(response) != "string"){
+      return response;
+    } else {
+      return {
+        message: response,
+        status: HttpStatus.BAD_REQUEST
+      };
+    }
+
   }
 
   @Patch("/change-password")
