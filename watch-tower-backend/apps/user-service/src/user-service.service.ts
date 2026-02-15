@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LoginDto } from 'core/dtos/login.dto';
+import { roleDto } from 'core/dtos/role.dto';
 import { signIn } from 'core/dtos/sing.dto';
 import { UserDto } from 'core/dtos/user.dto';
 import { RoleUserEntity } from 'core/entities/role-user.entity';
@@ -17,24 +18,26 @@ export class UserService {
     @InjectRepository(RoleEntity) private roleRepository: Repository<RoleEntity>,
   ) { }
 
-  async createUser(singIn: signIn): Promise<UserDto> {
+  async createUser(sing: signIn): Promise<UserDto> {
     const user = new UserEntity();
-    user.name = singIn.name;
-    user.userName = singIn.userName;
-    user.email = singIn.email;
-    user.password = singIn.password;
-    user.pin = singIn.pin;
-    user.securityQuestion = singIn.securityQuestion;
-    user.securityAnswer = singIn.securityAnswer;
-    user.email = singIn.email;
+    const password = await bcrypt.hash(sing.password, 10);
+    console.log(`hashed password: ${password}`);
+    user.name = sing.name;
+    user.userName = sing.userName;
+    user.email = sing.email;
+    user.password = password;
+    user.pin = sing.pin;
+    user.securityQuestion = sing.securityQuestion;
+    user.securityAnswer = sing.securityAnswer;
+    user.email = sing.email;
 
-    let rolesId = singIn.roles.map(role => {
+    let rolesId = sing.roles.map(role => {
       return role.id
     })
 
     let roles = await this.roleRepository.createQueryBuilder()
       .select()
-      .where("id IN(...:id))", { id: rolesId })
+      .where("id IN(:...id)", { id: rolesId })
       .getMany();
 
     let rolesUsers = roles.map(role => {
@@ -59,11 +62,23 @@ export class UserService {
       .orWhere("uu.email = :email", { email: user.email })
       .getOne();
 
+    let roles: roleDto[] = (await this.roleRepository.createQueryBuilder()
+    .select(["id as id", "role as role"])
+    .where("id IN(:...roles)", {roles: login?.roles.map(role => {return role.role})})
+    .getRawMany()) as roleDto[];
+
     try {
       if (login != null) {
-        let comparePassword = await bcrypt.compare(user.password, login.password)
+        let hashPass = await bcrypt.hash(user.password, 10);
+        let comparePassword = await bcrypt.compare(user.password, login.password);
         if(comparePassword == true){
-          return login as UserDto;
+          return {
+            userName: login.userName,
+            email: login.email,
+            role: roles,
+            documents: [],
+            policies: []
+          };
         } else {
           return "user/password incorrect"
         }
