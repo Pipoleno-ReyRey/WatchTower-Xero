@@ -11,4 +11,5 @@ export class signIn{
     policies?: string[];
     securityQuestion?: string;
     securityAnswer?: string;
+    ip!: string;
 }

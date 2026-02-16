@@ -4,7 +4,7 @@ import { documentDto } from 'core/dtos/document.dto';
 import { LoginDto } from 'core/dtos/login.dto';
 import { roleDto } from 'core/dtos/role.dto';
 import { sessionDto } from 'core/dtos/session.dto';
-import { signIn } from 'core/dtos/sing.dto';
+import { signIn } from 'core/dtos/sign.dto';
 import { UserDto } from 'core/dtos/user.dto';
 import { RoleUserEntity } from 'core/entities/role-user.entity';
 import { RoleEntity } from 'core/entities/role.entity';
@@ -22,21 +22,20 @@ export class UserService {
     @InjectRepository(SessionEntity) private sessionRepository: Repository<SessionEntity>
   ) { }
 
-  async createUser(sing: signIn): Promise<UserDto> {
+  async createUser(sign: signIn): Promise<UserDto> {
     try {
       const user = new UserEntity();
-      const password = await bcrypt.hash(sing.password, 10);
-      console.log(`hashed password: ${password}`);
-      user.name = sing.name;
-      user.userName = sing.userName;
-      user.email = sing.email;
+      const password = await bcrypt.hash(sign.password, 10);
+      user.name = sign.name;
+      user.userName = sign.userName;
+      user.email = sign.email;
       user.password = password;
-      user.pin = sing.pin;
-      user.securityQuestion = sing.securityQuestion;
-      user.securityAnswer = sing.securityAnswer;
-      user.email = sing.email;
+      user.pin = sign.pin;
+      user.securityQuestion = sign.securityQuestion;
+      user.securityAnswer = sign.securityAnswer;
+      user.email = sign.email;
 
-      let rolesId = sing.roles.map(role => {
+      let rolesId = sign.roles.map(role => {
         return role.id
       })
 
@@ -53,10 +52,10 @@ export class UserService {
         return data;
       })
 
-      await this.userRepository.save(user);
+      let newUser: UserEntity = await this.userRepository.save(user);
       await this.roleUserRepository.save(rolesUsers);
-
-      return user as UserDto
+      await this.createSession(sign, newUser, "REGISTER");
+      return newUser as UserDto;
     } catch (error: any) {
       return error.message;
     }
@@ -79,7 +78,7 @@ export class UserService {
       if (login != null) {
         let comparePassword = await bcrypt.compare(user.password, login.password);
         if (comparePassword == true) {
-          await this.createSession(user, login)
+          await this.createSession(user, login, "LOGIN")
           return {
             userName: login.userName,
             email: login.email,
@@ -99,10 +98,10 @@ export class UserService {
 
   }
 
-  private async createSession(login: LoginDto, user: UserEntity){
+  private async createSession(logs, user: UserEntity, action: string){
     let session: SessionEntity = {
-      ipAddress: login.session!.ip,
-      action: "LOGIN",
+      ipAddress: logs.session!.ip,
+      action: action,
       status: true,
       user: user
     } as SessionEntity;
