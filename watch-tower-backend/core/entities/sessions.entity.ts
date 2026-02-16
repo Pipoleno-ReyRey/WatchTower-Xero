@@ -5,7 +5,7 @@ import { UserEntity } from "./user.entity";
 export class SessionEntity {
 
     @PrimaryGeneratedColumn({ name: "id" })
-    id!: number;
+    id?: number;
 
     @Column({ name: "ip_address", type: "varchar", nullable: false, length: 100 })
     ipAddress!: string;
@@ -13,23 +13,17 @@ export class SessionEntity {
     @Column({ name: "action" })
     action!: string;
 
-    @Column({ name: "device_info", type: "text", nullable: false })
-    deviceInfo!: string;
-
     @Column({ name: "status", type: "boolean", default: true, nullable: false })
     status!: boolean;
 
     @Column({ name: "created_at", type: "timestamp", default: () => "CURRENT_TIMESTAMP", nullable: false })
-    createdAt!: Date;
+    createdAt?: Date;
 
     @Column({ name: "ended_at", type: "timestamp", default: () => "CURRENT_TIMESTAMP", nullable: false })
-    endedAt!: Date;
-
-    @Column({ name: "user", type: "varchar", length: 50, nullable: false })
-    userName!: string;
+    endedAt?: Date;
 
     @OneToOne(() => UserEntity, user => user.userName)
-    @JoinColumn({ name: "user", referencedColumnName: "user_name" })
+    @JoinColumn({ name: "user", referencedColumnName: "userName" })
     user!: UserEntity;
 
 }

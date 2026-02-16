@@ -1,3 +1,5 @@
+import { sessionDto } from "./session.dto";
+
 export class LoginDto {
   email?: string;
   user?: string;
@@ -5,4 +7,5 @@ export class LoginDto {
   pin?: string;
   securityQuestion?: string;
   securityAnswer?: string;
+  session?: sessionDto;
 }

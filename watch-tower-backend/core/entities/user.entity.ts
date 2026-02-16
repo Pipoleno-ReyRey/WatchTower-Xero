@@ -50,8 +50,8 @@ export class UserEntity {
     // @JoinColumn({name: "user_name"})
     // policies!: PoliciesUserEntity[];
 
-    // @OneToMany(() => DocumentEntity, document => document.user)
-    // @JoinColumn({name: "user_name"})
-    // documents?: DocumentEntity[];
+    @OneToMany(() => DocumentEntity, document => document.user)
+    @JoinColumn({name: "user_name"})
+    documents?: DocumentEntity[];
 
 }

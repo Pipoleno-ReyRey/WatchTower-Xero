@@ -9,15 +9,15 @@ export class DocumentEntity {
     @Column({name: "title", type: "varchar", nullable: false})
     title!: string;
 
-    @Column({name: "content", type: "longtext", nullable: false})
+    @Column({name: "content", type: "text", nullable: false})
     content!: string;
 
     @Column({name: "created_at", type: "timestamp", default: () => "CURRENT_TIMESTAMP"})
     createdAt!: Date;
 
-    // @ManyToOne(() => UserEntity, user => user.documents)
-    // @JoinColumn({name: "user", referencedColumnName: "user_name"})
-    // user!: UserEntity;
+    @ManyToOne(() => UserEntity, user => user.documents)
+    @JoinColumn({name: "user", referencedColumnName: "userName"})
+    user!: UserEntity;
 
     @Column({name: "password", type: "varchar", nullable: true})
     password!: string;
