@@ -1,12 +1,19 @@
 import { Controller, Get } from '@nestjs/common';
-import { DocumentServiceService } from './document-service.service';
+import { DocumentService } from './document-service.service';
+import { DocumentEntity } from 'core/entities/document.entity';
+import { documentDto } from 'core/dtos/document.dto';
 
-@Controller()
-export class DocumentServiceController {
-  constructor(private readonly documentServiceService: DocumentServiceService) {}
+@Controller("docs")
+export class DocumentController {
+  constructor(private readonly DocumentService: DocumentService) {}
 
   @Get()
-  getHello(): string {
-    return this.documentServiceService.getHello();
+  async documents(): Promise<DocumentEntity[]> {
+    return await this.DocumentService.getDocuments();
+  }
+
+  @Get("get-specific-doc/:pass")
+  async getDoc(): Promise<documentDto>{
+    
   }
 }

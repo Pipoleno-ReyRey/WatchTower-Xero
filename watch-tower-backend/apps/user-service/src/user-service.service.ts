@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { documentDto } from 'core/dtos/document.dto';
 import { LoginDto } from 'core/dtos/login.dto';
@@ -61,7 +61,7 @@ export class UserService {
     }
   }
 
-  async getUser(user: LoginDto): Promise<UserDto | string> {
+  async getUser(user: LoginDto): Promise<UserDto| any> {
 
     try {
       let login: UserEntity | null = await this.userRepository.createQueryBuilder("uu")
@@ -71,11 +71,12 @@ export class UserService {
         .orWhere("uu.email = :email", { email: user.email })
         .getOne();
 
-      let roles: roleDto[] = (await this.roleRepository.createQueryBuilder()
+      if (login) {
+        let roles: roleDto[] = (await this.roleRepository.createQueryBuilder()
         .select(["id as id", "role as role"])
         .where("id IN(:...roles)", { roles: login?.roles.map(role => { return role.role }) })
         .getRawMany()) as roleDto[];
-      if (login != null) {
+
         let comparePassword = await bcrypt.compare(user.password, login.password);
         if (comparePassword == true) {
           await this.createSession(user, login, "LOGIN")
@@ -87,10 +88,10 @@ export class UserService {
             policies: []
           };
         } else {
-          return "user/password incorrect"
+          return null
         }
       } else {
-        return "user not found"
+        return null;
       }
     } catch (error: any) {
       return error.message as string;
@@ -103,9 +104,15 @@ export class UserService {
       ipAddress: logs.session!.ip,
       action: action,
       status: true,
-      user: user
+      user: user,
     } as SessionEntity;
 
+    console.log(session)
+
     return await this.sessionRepository.save(session);
+  }
+
+  async getAllUsers(){
+    return await this.userRepository.createQueryBuilder().select().getMany()
   }
 }

@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { DocumentServiceModule } from './../src/document-service.module';
 
-describe('DocumentServiceController (e2e)', () => {
+describe('DocumentController (e2e)', () => {
   let app: INestApplication;
 
   beforeEach(async () => {

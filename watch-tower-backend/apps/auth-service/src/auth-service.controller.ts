@@ -8,7 +8,7 @@ export class AuthServiceController {
   constructor(private readonly authService: AuthService) {}
 
   @Post()
-  async loginToken(@Body("user") user: UserDto) {
-    return "Login endpoint";
+  async loginToken(@Body() login: LoginDto) {
+    return await this.authService.generateToken(login);
   }
 }

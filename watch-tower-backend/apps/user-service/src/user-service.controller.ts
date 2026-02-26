@@ -1,24 +1,22 @@
-import { Body, Controller, Get, HttpStatus, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Patch, Post } from '@nestjs/common';
 import { UserService } from './user-service.service';
 import { LoginDto } from 'core/dtos/login.dto';
 import { signIn } from 'core/dtos/sign.dto';
+import { MessageChannel } from 'worker_threads';
 
 @Controller("user")
 export class UserServiceController {
   constructor(private readonly userService: UserService) {}
 
   @Post("/login-user-validation")
-  async loginUser(@Body("login") login: LoginDto) {
+  async loginUser(@Body() login: LoginDto) {
     let response = await this.userService.getUser(login);
-    if(typeof(response) != "string"){
-      return response;
+    if(!response){
+      // throw new HttpException("user not found", 404)
+      return null;
     } else {
-      return {
-        message: response,
-        status: HttpStatus.BAD_REQUEST
-      };
+      return response;
     }
-
   }
 
   @Patch("/change-password")
@@ -31,4 +29,8 @@ export class UserServiceController {
     return await this.userService.createUser(sign)
   }
 
+  @Get("/getAll")
+  async all(){
+    return await this.userService.getAllUsers();
+  }
 }
