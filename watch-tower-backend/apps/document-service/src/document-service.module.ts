@@ -6,6 +6,10 @@ import { UserEntity } from 'core/entities/user.entity';
 import { DocumentEntity } from 'core/entities/document.entity';
 import { ConfigModule } from '@nestjs/config';
 import { entitiesDb } from 'core/envs/db-entities.env';
+import { AuthGuard } from 'core/guards/auth.guard';
+import { AuthService } from 'apps/auth-service/src/auth-service.service';
+import { AuthServiceModule } from 'apps/auth-service/src/auth-service.module';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -19,9 +23,10 @@ import { entitiesDb } from 'core/envs/db-entities.env';
       database: process.env.DB_NAME || "watchtower",
       entities: [...entitiesDb],
     }), 
-    TypeOrmModule.forFeature([...entitiesDb])
+    TypeOrmModule.forFeature([...entitiesDb]),
+    AuthServiceModule
   ],
   controllers: [DocumentController],
-  providers: [DocumentService],
+  providers: [DocumentService, JwtService],
 })
 export class DocumentServiceModule { }
