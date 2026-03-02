@@ -7,6 +7,4 @@ export class UserDto{
     userName?: string;
     email?: string;
     role?: roleDto[];
-    policies?: string[];
-    documents?: documentDto[];
 }

@@ -1,4 +1,5 @@
 import { AuditLogEntity } from "core/entities/audit-logs.entity";
+import { DocsActionsEntity } from "core/entities/docs_actions.entity";
 import { DocumentEntity } from "core/entities/document.entity";
 import { PoliciesUserEntity } from "core/entities/policies-user.entity";
 import { PolicyEntity } from "core/entities/policies.entity";
@@ -12,5 +13,6 @@ export const entitiesDb = [
     RoleEntity,
     RoleUserEntity,
     DocumentEntity,
-    SessionEntity
+    SessionEntity,
+    DocsActionsEntity
 ]
