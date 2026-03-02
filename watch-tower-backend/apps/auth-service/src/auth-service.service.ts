@@ -23,17 +23,19 @@ export class AuthService {
         }
       ));
 
-      console.log(user)
-
       if (user.ok) {
-
-        return user
+        return this.jwt.sign( await user.json() );
       } else {
-
-        throw new UnauthorizedException;
+        throw new HttpException("not found", 404);
       }
     } catch (error: any) {
-      throw new HttpException("not found", 404);
+      throw new HttpException(error.message, 500);
     }
+  }
+
+  validateToken(token: string){
+    return this.jwt.verify(token, {
+      secret: process.env.TOKEN_SECRET
+    })
   }
 }
