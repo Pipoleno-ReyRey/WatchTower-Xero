@@ -12,8 +12,7 @@ export class UserServiceController {
   async loginUser(@Body() login: LoginDto) {
     let response = await this.userService.getUser(login);
     if(!response){
-      // throw new HttpException("user not found", 404)
-      return null;
+      throw new HttpException("user not found", 404)
     } else {
       return response;
     }

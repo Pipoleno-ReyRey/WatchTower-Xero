@@ -83,9 +83,7 @@ export class UserService {
           return {
             userName: login.userName,
             email: login.email,
-            role: roles,
-            documents: login.documents as documentDto[],
-            policies: []
+            role: roles
           };
         } else {
           return null
