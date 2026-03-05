@@ -7,8 +7,8 @@ export class GatewayController {
   constructor(private readonly gatewayService: GatewayService) {}
 
   @Post("/login")
-  async login(@Body("login") login: LoginDto) {
-    return "Login endpoint";
+  async login(@Body() login: LoginDto) {
+    return await this.gatewayService.loginGateway(login);
   }
 
   @Post("/sign")

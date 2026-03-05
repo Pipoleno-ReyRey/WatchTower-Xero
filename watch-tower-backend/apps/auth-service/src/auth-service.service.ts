@@ -23,8 +23,18 @@ export class AuthService {
         }
       ));
 
+      let data = await user.json()
+      let response = {
+        userName: data.userName,
+        email: data.email,
+        role: data.role
+      }
+
       if (user.ok) {
-        return this.jwt.sign( await user.json() );
+        return {
+          ...response,
+          token: this.jwt.sign(response)
+        }
       } else {
         throw new HttpException("not found", 404);
       }

@@ -7,4 +7,6 @@ export class UserDto{
     userName?: string;
     email?: string;
     role?: roleDto[];
+    documents?: documentDto[];
+    token?: string;
 }

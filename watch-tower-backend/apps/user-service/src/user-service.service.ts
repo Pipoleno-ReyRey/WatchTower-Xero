@@ -54,7 +54,7 @@ export class UserService {
 
       let newUser: UserEntity = await this.userRepository.save(user);
       await this.roleUserRepository.save(rolesUsers);
-      await this.createSession(sign, newUser, "REGISTER");
+      // await this.createSession(sign, newUser, "REGISTER");
       return newUser as UserDto;
     } catch (error: any) {
       return error.message;
@@ -79,7 +79,7 @@ export class UserService {
 
         let comparePassword = await bcrypt.compare(user.password, login.password);
         if (comparePassword == true) {
-          await this.createSession(user, login, "LOGIN")
+          // await this.createSession(user, login, "LOGIN")
           return {
             userName: login.userName,
             email: login.email,
