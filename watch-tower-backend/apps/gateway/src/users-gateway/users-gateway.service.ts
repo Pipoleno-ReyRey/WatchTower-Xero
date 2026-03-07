@@ -1,6 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { LoginDto } from 'core/dtos/login.dto';
 import { signIn } from 'core/dtos/sign.dto';
+import { RoleEntity } from 'core/entities/role.entity';
 
 @Injectable()
 export class UsersGatewayService {
@@ -26,8 +27,9 @@ export class UsersGatewayService {
     }
   }
 
-  async signIn(user: signIn){
+  async signIn(user: signIn, ip: string): Promise<LoginDto | null>{
     try{
+      user.ip = ip;
       let login = await fetch("http://localhost:8001/user/sign-in-user", {
         method: "POST",
         headers: {
@@ -41,8 +43,28 @@ export class UsersGatewayService {
         data.password = user.password;
         console.log(data);
         return await this.loginGateway(data);
-      } else if(login.status === 404) {
-        throw new HttpException("not found", 404);
+      } else {
+        return null;
+      }
+    } catch(error: any){
+      throw new HttpException(error.message, 500);
+    }
+  }
+
+  async getRoles(token: string): Promise<RoleEntity[] | null>{
+    try{
+      let data = await fetch("http://localhost:8001/user/roles/all", {
+        method: "GET",
+        headers: {
+          "content-type": "application/json",
+          "token": token
+        }
+      });
+
+      if(data.ok){
+        return await data.json() as RoleEntity[];
+      } else {
+        return null;
       }
     } catch(error: any){
       throw new HttpException(error.message, 500);
