@@ -25,7 +25,7 @@ export class UserServiceController {
   }
 
   @Post("/sign-in-user")
-  async signUp(@Body("sign") sign: signIn) {
+  async signUp(@Body() sign: signIn) {
     return await this.userService.createUser(sign)
   }
 

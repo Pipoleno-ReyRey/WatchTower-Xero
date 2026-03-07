@@ -22,7 +22,7 @@ export class UserService {
     @InjectRepository(SessionEntity) private sessionRepository: Repository<SessionEntity>
   ) { }
 
-  async createUser(sign: signIn): Promise<UserDto> {
+  async createUser(sign: signIn): Promise<LoginDto> {
     try {
       const user = new UserEntity();
       const password = await bcrypt.hash(sign.password, 10);
@@ -55,9 +55,14 @@ export class UserService {
       let newUser: UserEntity = await this.userRepository.save(user);
       await this.roleUserRepository.save(rolesUsers);
       // await this.createSession(sign, newUser, "REGISTER");
-      return newUser as UserDto;
+      return {
+        email: newUser.email,
+        user: newUser.userName,
+        password: newUser.password,
+        pin: newUser.pin
+      };
     } catch (error: any) {
-      return error.message;
+      throw new HttpException(error.message, 500)
     }
   }
 
@@ -66,11 +71,11 @@ export class UserService {
     try {
       let login: UserEntity | null = await this.userRepository.createQueryBuilder("uu")
         .innerJoinAndSelect("uu.roles", "roles")
-        .innerJoinAndSelect("uu.documents", "documents")
         .where("uu.user_name = :userName", { userName: user.user })
         .orWhere("uu.email = :email", { email: user.email })
         .getOne();
 
+        console.log(login);
       if (login) {
         let roles: roleDto[] = (await this.roleRepository.createQueryBuilder()
         .select(["id as id", "role as role"])
@@ -87,7 +92,7 @@ export class UserService {
             role: roles
           };
         } else {
-          return null
+          return null;
         }
       } else {
         return null;
