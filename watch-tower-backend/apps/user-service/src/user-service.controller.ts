@@ -1,9 +1,10 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { UserService } from './user-service.service';
 import { LoginDto } from 'core/dtos/login.dto';
 import { signIn } from 'core/dtos/sign.dto';
 import { MessageChannel } from 'worker_threads';
 import { AuthGuard } from 'core/guards/auth.guard';
+import { RoleEntity } from 'core/entities/role.entity';
 
 @Controller("user")
 export class UserServiceController {
@@ -26,12 +27,23 @@ export class UserServiceController {
 
   @Post("/sign-in-user")
   async signUp(@Body() sign: signIn) {
-    return await this.userService.createUser(sign)
+    let response = await this.userService.createUser(sign)
+    if(!response){
+      throw new HttpException("user exist", 409)
+    } else {
+      return response;
+    }
   }
 
   @Get("/all")
   @UseGuards(AuthGuard)
   async all(){
     return await this.userService.getAllUsers();
+  }
+
+  @Get("/roles/all")
+  @UseGuards(AuthGuard)
+  async allRoles(): Promise<RoleEntity[]>{
+    return await this.userService.getAllRoles();
   }
 }

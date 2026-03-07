@@ -22,7 +22,7 @@ export class UserService {
     @InjectRepository(SessionEntity) private sessionRepository: Repository<SessionEntity>
   ) { }
 
-  async createUser(sign: signIn): Promise<LoginDto> {
+  async createUser(sign: signIn): Promise<LoginDto | null> {
     try {
       const user = new UserEntity();
       const password = await bcrypt.hash(sign.password, 10);
@@ -34,6 +34,17 @@ export class UserService {
       user.securityQuestion = sign.securityQuestion;
       user.securityAnswer = sign.securityAnswer;
       user.email = sign.email;
+
+      let findUser: UserEntity | null = await this.userRepository
+      .createQueryBuilder()
+      .select()
+      .where("user_name = :userName", {userName: user.userName})
+      .orWhere("email = :email", {email: user.email})
+      .getOne();
+
+      if(findUser){
+        return null;
+      }
 
       let rolesId = sign.roles.map(role => {
         return role.id
@@ -62,7 +73,7 @@ export class UserService {
         pin: newUser.pin
       };
     } catch (error: any) {
-      throw new HttpException(error.message, 500)
+      throw new HttpException(error.message, 400)
     }
   }
 
@@ -143,5 +154,15 @@ export class UserService {
     } catch(error: any){
       throw new HttpException(error.message, 500);
     }
+  }
+
+
+  async getAllRoles(){
+    let data: RoleEntity[] = await this.roleRepository
+    .createQueryBuilder()
+    .select()
+    .getMany();
+
+    return data;
   }
 }
