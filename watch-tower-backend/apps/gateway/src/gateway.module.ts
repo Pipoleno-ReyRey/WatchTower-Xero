@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
-import { GatewayController } from './gateway.controller';
-import { GatewayService } from './gateway.service';
+import { UsersController } from './users-gateway/users.controller';
+import { UsersGatewayService } from './users-gateway/users-gateway.service';
 import { ConfigModule } from '@nestjs/config';
+import { DocsGatewayController } from './docs-gateway/docs-gateway.controller';
+import { DocsGatewayService } from './docs-gateway/docs-gateway.service';
 
 @Module({
   imports: [ConfigModule.forRoot({isGlobal: true})],
-  controllers: [GatewayController],
-  providers: [GatewayService],
+  controllers: [UsersController, DocsGatewayController,],
+  providers: [UsersGatewayService, DocsGatewayService],
 })
 export class GatewayModule {}
