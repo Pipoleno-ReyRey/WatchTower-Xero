@@ -78,7 +78,8 @@ export class UserService {
         .getRawMany()) as roleDto[];
 
         let comparePassword = await bcrypt.compare(user.password, login.password);
-        if (comparePassword == true) {
+        let pin = login.pin === user.pin ? true : false;
+        if (comparePassword && pin) {
           // await this.createSession(user, login, "LOGIN")
           return {
             userName: login.userName,
@@ -111,6 +112,31 @@ export class UserService {
   }
 
   async getAllUsers(){
-    return await this.userRepository.createQueryBuilder().select().getMany()
+    try{
+      let users: UserEntity[] | null = await this.userRepository
+      .createQueryBuilder("uu")
+      .innerJoinAndSelect("uu.roles", "roles")
+      .getMany();
+
+      if(users.length < 0){
+        return;
+      }
+
+      let response: UserDto[] = users.map(user => {
+        return {
+          userName: user.userName,
+          email: user.email,
+          role: user.roles.map(roles => {
+            return {
+              role: roles.role.role
+            }
+          })
+        }
+      })
+
+      return response;
+    } catch(error: any){
+      throw new HttpException(error.message, 500);
+    }
   }
 }

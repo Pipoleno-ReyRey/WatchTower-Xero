@@ -1,8 +1,9 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Patch, Post, UseGuards } from '@nestjs/common';
 import { UserService } from './user-service.service';
 import { LoginDto } from 'core/dtos/login.dto';
 import { signIn } from 'core/dtos/sign.dto';
 import { MessageChannel } from 'worker_threads';
+import { AuthGuard } from 'core/guards/auth.guard';
 
 @Controller("user")
 export class UserServiceController {
@@ -28,7 +29,8 @@ export class UserServiceController {
     return await this.userService.createUser(sign)
   }
 
-  @Get("/getAll")
+  @Get("/all")
+  @UseGuards(AuthGuard)
   async all(){
     return await this.userService.getAllUsers();
   }

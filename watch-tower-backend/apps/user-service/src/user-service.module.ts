@@ -4,6 +4,7 @@ import { UserService } from './user-service.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { entitiesDb } from 'core/envs/db-entities.env';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -19,6 +20,6 @@ import { entitiesDb } from 'core/envs/db-entities.env';
   }),
   TypeOrmModule.forFeature([...entitiesDb])],
   controllers: [UserServiceController],
-  providers: [UserService],
+  providers: [UserService, JwtService],
 })
 export class UserServiceModule { }
