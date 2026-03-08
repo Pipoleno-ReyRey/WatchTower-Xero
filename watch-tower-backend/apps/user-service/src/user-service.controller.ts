@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Patch, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { UserService } from './user-service.service';
 import { LoginDto } from 'core/dtos/login.dto';
 import { signIn } from 'core/dtos/sign.dto';
@@ -14,7 +14,7 @@ export class UserServiceController {
   async loginUser(@Body() login: LoginDto) {
     let response = await this.userService.getUser(login);
     if(!response){
-      throw new HttpException("user not found", 404)
+      throw new UnauthorizedException;
     } else {
       return response;
     }

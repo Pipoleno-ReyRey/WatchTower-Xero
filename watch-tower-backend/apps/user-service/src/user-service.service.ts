@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { documentDto } from 'core/dtos/document.dto';
 import { LoginDto } from 'core/dtos/login.dto';
 import { roleDto } from 'core/dtos/role.dto';
-import { sessionDto } from 'core/dtos/session.dto';
+import { SessionDto } from 'core/dtos/session.dto';
 import { signIn } from 'core/dtos/sign.dto';
 import { UserDto } from 'core/dtos/user.dto';
 import { RoleUserEntity } from 'core/entities/role-user.entity';
@@ -80,6 +80,7 @@ export class UserService {
   async getUser(user: LoginDto): Promise<UserDto | any> {
 
     try {
+      
       let login: UserEntity | null = await this.userRepository.createQueryBuilder("uu")
         .innerJoinAndSelect("uu.roles", "roles")
         .where("uu.user_name = :userName", { userName: user.user })
