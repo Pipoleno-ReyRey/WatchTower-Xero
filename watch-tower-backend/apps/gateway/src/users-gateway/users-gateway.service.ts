@@ -6,7 +6,7 @@ import { RoleEntity } from 'core/entities/role.entity';
 @Injectable()
 export class UsersGatewayService {
 
-  async loginGateway(login: LoginDto) {
+  async loginGateway(login: LoginDto, ip: string) {
     try {
       let response = await fetch("http://localhost:8003/token/", {
         method: "POST",
@@ -42,7 +42,7 @@ export class UsersGatewayService {
         let data = (await login.json()) as LoginDto;
         data.password = user.password;
         console.log(data);
-        return await this.loginGateway(data);
+        return await this.loginGateway(data, ip);
       } else {
         return null;
       }

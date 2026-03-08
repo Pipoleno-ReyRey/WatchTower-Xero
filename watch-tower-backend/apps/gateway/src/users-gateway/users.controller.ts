@@ -8,8 +8,8 @@ export class UsersController {
   constructor(private readonly gatewayService: UsersGatewayService) {}
 
   @Post("/login")
-  async login(@Body() login: LoginDto) {
-    return await this.gatewayService.loginGateway(login);
+  async login(@Body() login: LoginDto, @Req() req) {
+    return await this.gatewayService.loginGateway(login, req.ip as string);
   }
 
   @Post("/sign-in")
