@@ -1,0 +1,137 @@
+import {
+  LayoutDashboard,
+  Users,
+  ChevronLeft,
+  ChevronRight,
+  Badge,
+  Eye,
+  LogOut,
+} from "lucide-react";
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+  useSidebar,
+} from "../ui/sidebar";
+
+import { Button } from "../ui/button";
+import { Separator } from "../ui/separator";
+
+import { Link } from "react-router-dom";
+const navItems = [
+  { path: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { path: "user", label: "Users", icon: Users },
+];
+
+export default function AppSidebar() {
+  const { state, toggleSidebar } = useSidebar();
+  const collapsed = state === "collapsed";
+
+  const currentUser = {
+    name: "Estarlin Germán",
+    role: "admin",
+  };
+
+  return (
+    <Sidebar  collapsible="icon" className="border-none">
+      {/* LOGO */}
+      <SidebarHeader>
+        <div className="flex h-16 items-center gap-3 px-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <Eye className="h-5 w-5" />
+          </div>
+
+          {!collapsed && (
+            <div className="flex flex-col leading-tight">
+              <span className="font-mono text-sm font-bold tracking-wider">
+                WATCHTOWER
+              </span>
+              <span className="font-mono text-[10px] tracking-widest text-primary">
+                XERO
+              </span>
+            </div>
+          )}
+        </div>
+      </SidebarHeader>
+
+      {/* NAVIGATION */}
+      <SidebarContent>
+        <SidebarMenu className="px-2 ">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <SidebarMenuItem key={item.path}>
+                <Link to={item.path}>
+                  <SidebarMenuButton
+                    tooltip={item.label}
+                    // isActive={active === item.path}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span>{item.label}</span>
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+            );
+          })}
+        </SidebarMenu>
+      </SidebarContent>
+
+      <Separator />
+
+      {/* USER SECTION */}
+      <SidebarFooter>
+        {!collapsed && (
+          <div className="mb-3 flex items-center gap-3 rounded-lg bg-muted px-3 py-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-primary">
+              {currentUser.name
+                .split(" ")
+                .map((n) => n[0])
+                .join("")}
+            </div>
+
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">{currentUser.name}</span>
+              <Badge className="mt-0.5 w-fit border-primary/30 px-1.5 py-0 text-[10px] text-primary">
+                {currentUser.role.toUpperCase()}
+              </Badge>
+            </div>
+          </div>
+        )}
+
+        <div className="flex items-center justify-between px-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleSidebar}
+            className="h-8 w-8"
+          >
+            {collapsed ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
+              <ChevronLeft className="h-4 w-4" />
+            )}
+          </Button>
+
+          {!collapsed && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="ml-auto h-8 text-xs text-muted-foreground hover:text-destructive"
+            >
+              <LogOut className="mr-1.5 h-3.5 w-3.5" />
+              Logout
+            </Button>
+          )}
+        </div>
+      </SidebarFooter>
+
+      <SidebarRail />
+    </Sidebar>
+  );
+}
