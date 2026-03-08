@@ -4,7 +4,7 @@ import { documentDto } from 'core/dtos/document.dto';
 @Injectable()
 export class DocsGatewayService {
 
-    async getAllDocs(token: string){
+    async getAllDocs(token: string): Promise<documentDto[] | null>{
         try{
             let data = await fetch("http://localhost:8005/docs", {
             method: "GET",
@@ -17,7 +17,7 @@ export class DocsGatewayService {
         if(data.ok){
             return await data.json();
         } else {
-            throw new HttpException("error", 404);
+            return null;
         }
         } catch(error: any){
             throw new HttpException(error.message, 500);

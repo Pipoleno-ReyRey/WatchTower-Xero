@@ -1,5 +1,6 @@
-import { Controller, Get, Headers } from '@nestjs/common';
+import { Controller, Get, Headers, HttpException, UnauthorizedException } from '@nestjs/common';
 import { DocsGatewayService } from './docs-gateway.service';
+import { documentDto } from 'core/dtos/document.dto';
 
 @Controller('docs')
 export class DocsGatewayController {
@@ -7,7 +8,12 @@ export class DocsGatewayController {
 
     @Get("/all")
     async all(@Headers("token") token: string){
-        return await this.service.getAllDocs(token);
+        let response: documentDto[] | null = await this.service.getAllDocs(token);
+        if(response){
+            return response;
+        } else {
+            throw new UnauthorizedException();
+        }
     }
 
 }
