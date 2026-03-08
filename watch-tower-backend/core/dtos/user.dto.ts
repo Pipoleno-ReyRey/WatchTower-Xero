@@ -9,4 +9,5 @@ export class UserDto{
     role?: roleDto[];
     documents?: documentDto[];
     token?: string;
+    status!: boolean;
 }
