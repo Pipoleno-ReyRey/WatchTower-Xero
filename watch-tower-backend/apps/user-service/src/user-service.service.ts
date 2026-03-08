@@ -73,7 +73,7 @@ export class UserService {
         pin: newUser.pin
       };
     } catch (error: any) {
-      throw new HttpException(error.message, 400)
+      throw new HttpException(error.message, 500)
     }
   }
 

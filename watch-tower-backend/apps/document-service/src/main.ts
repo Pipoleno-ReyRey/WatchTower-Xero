@@ -3,6 +3,7 @@ import { DocumentServiceModule } from './document-service.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(DocumentServiceModule);
+  app.enableCors();
   await app.listen(process.env.DOCS_SERVICE_PORT ?? 3000);
 }
 bootstrap();
