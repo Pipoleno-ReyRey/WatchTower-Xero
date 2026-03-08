@@ -21,7 +21,6 @@ export class DocumentController {
 
   @Get("get-specific-doc")
   async getDoc(@Query("title") title: string, @Query("pass") pass: string, @Req() req){
-    console.log(title, pass);
     return await this.DocumentService.getSpecificDoc(title, pass, req.info.userName);
   }
 }

@@ -29,6 +29,7 @@ export class DocumentService {
             title: doc.title,
             content: doc.content,
             createdAt: doc.createdAt,
+            updatedAt: doc.updatedAt,
             owner: doc.user.userName
           }
         })

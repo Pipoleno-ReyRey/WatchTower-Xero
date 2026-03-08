@@ -36,13 +36,13 @@ export class UserService {
       user.email = sign.email;
 
       let findUser: UserEntity | null = await this.userRepository
-      .createQueryBuilder()
-      .select()
-      .where("user_name = :userName", {userName: user.userName})
-      .orWhere("email = :email", {email: user.email})
-      .getOne();
+        .createQueryBuilder()
+        .select()
+        .where("user_name = :userName", { userName: user.userName })
+        .orWhere("email = :email", { email: user.email })
+        .getOne();
 
-      if(findUser){
+      if (findUser) {
         return null;
       }
 
@@ -77,7 +77,7 @@ export class UserService {
     }
   }
 
-  async getUser(user: LoginDto): Promise<UserDto| any> {
+  async getUser(user: LoginDto): Promise<UserDto | any> {
 
     try {
       let login: UserEntity | null = await this.userRepository.createQueryBuilder("uu")
@@ -86,17 +86,16 @@ export class UserService {
         .orWhere("uu.email = :email", { email: user.email })
         .getOne();
 
-        console.log(login);
       if (login) {
         let roles: roleDto[] = (await this.roleRepository.createQueryBuilder()
-        .select(["id as id", "role as role"])
-        .where("id IN(:...roles)", { roles: login?.roles.map(role => { return role.role }) })
-        .getRawMany()) as roleDto[];
+          .select(["id as id", "role as role"])
+          .where("id IN(:...roles)", { roles: login?.roles.map(role => { return role.role }) })
+          .getRawMany()) as roleDto[];
 
         let comparePassword = await bcrypt.compare(user.password, login.password);
         let pin = login.pin === user.pin ? true : false;
         if (comparePassword && pin) {
-          // await this.createSession(user, login, "LOGIN")
+          await this.createSession(user, login, "LOGIN")
           return {
             userName: login.userName,
             email: login.email,
@@ -114,27 +113,29 @@ export class UserService {
 
   }
 
-  private async createSession(logs, user: UserEntity, action: string){
-    let session: SessionEntity = {
-      ipAddress: logs.session!.ip,
-      action: action,
-      status: true,
-      user: user,
-    } as SessionEntity;
+  private async createSession(logs: LoginDto, user: UserEntity, action: string) {
+    try {
+      let session: SessionEntity = {
+        ipAddress: logs.session!.ip,
+        action: action,
+        status: true,
+        user: user,
+      } as SessionEntity;
 
-    console.log(session)
-
-    return await this.sessionRepository.save(session);
+      return await this.sessionRepository.save(session);
+    } catch (error: any) {
+      throw new HttpException(error.message, 500);
+    }
   }
 
-  async getAllUsers(){
-    try{
+  async getAllUsers(): Promise<UserDto[] | undefined> {
+    try {
       let users: UserEntity[] | null = await this.userRepository
-      .createQueryBuilder("uu")
-      .innerJoinAndSelect("uu.roles", "roles")
-      .getMany();
+        .createQueryBuilder("uu")
+        .innerJoinAndSelect("uu.roles", "roles")
+        .getMany();      
 
-      if(users.length < 0){
+      if (users.length < 0) {
         return;
       }
 
@@ -142,27 +143,32 @@ export class UserService {
         return {
           userName: user.userName,
           email: user.email,
+          status: user.status,
           role: user.roles.map(roles => {
             return {
               role: roles.role.role
             }
           })
         }
-      })
+      });
 
       return response;
-    } catch(error: any){
+    } catch (error: any) {
       throw new HttpException(error.message, 500);
     }
   }
 
 
-  async getAllRoles(){
+  async getAllRoles() {
     let data: RoleEntity[] = await this.roleRepository
-    .createQueryBuilder()
-    .select()
-    .getMany();
+      .createQueryBuilder()
+      .select()
+      .getMany();
 
     return data;
   }
+
+  // async createRole(): Promise<>{
+
+  // }
 }

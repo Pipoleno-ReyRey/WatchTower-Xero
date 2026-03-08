@@ -9,6 +9,12 @@ export class UsersGatewayService {
 
   async loginGateway(login: LoginDto, ip: string) {
     try {
+      login.session = {
+        ip: ip,
+        action: "LOGIN",
+        status: true
+      };
+
       let response = await fetch("http://localhost:8003/token/", {
         method: "POST",
         headers: {
@@ -42,7 +48,6 @@ export class UsersGatewayService {
       if(login.ok){
         let data = (await login.json()) as LoginDto;
         data.password = user.password;
-        console.log(data);
         return await this.loginGateway(data, ip);
       } else {
         return null;
