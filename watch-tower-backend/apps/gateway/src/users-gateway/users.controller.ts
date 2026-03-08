@@ -31,5 +31,15 @@ export class UsersController {
       return response;
     }
   }
+
+  @Get("user/all")
+  async allUsers(@Headers("token") token: string){
+    let response = await this.gatewayService.getUsers(token);
+    if(!response){
+      throw new HttpException("roles not found", 404);
+    } else {
+      return response;
+    }
+  }
   
 }

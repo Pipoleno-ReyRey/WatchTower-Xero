@@ -1,6 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { LoginDto } from 'core/dtos/login.dto';
 import { signIn } from 'core/dtos/sign.dto';
+import { UserDto } from 'core/dtos/user.dto';
 import { RoleEntity } from 'core/entities/role.entity';
 
 @Injectable()
@@ -63,6 +64,26 @@ export class UsersGatewayService {
 
       if(data.ok){
         return await data.json() as RoleEntity[];
+      } else {
+        return null;
+      }
+    } catch(error: any){
+      throw new HttpException(error.message, 500);
+    }
+  }
+
+  async getUsers(token: string){
+    try{
+      let data = await fetch("http://localhost:8001/user/all", {
+        method: "GET",
+        headers: {
+          "content-type": "application/json",
+          "token": token
+        }
+      });
+
+      if(data.ok){
+        return await data.json() as UserDto[];
       } else {
         return null;
       }
