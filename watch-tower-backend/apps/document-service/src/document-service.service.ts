@@ -9,63 +9,80 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class DocumentService {
-  
+
   constructor(
     @InjectRepository(DocumentEntity) private docRepo: Repository<DocumentEntity>,
     @InjectRepository(DocsActionsEntity) private actions: Repository<DocsActionsEntity>,
-    @InjectRepository(UserEntity) private  userRepo: Repository<UserEntity>
-  ){}
+    @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>
+  ) { }
 
-  async getDocuments(): Promise<DocumentEntity[]>{
-    let documents: DocumentEntity[] = await this.docRepo
-    .createQueryBuilder("doc")
-    .innerJoinAndSelect("doc.user", "user")
-    .getMany()
+  async getDocuments(): Promise<documentDto[] | null> {
+    try {
+      let data: DocumentEntity[] = await this.docRepo
+        .createQueryBuilder("doc")
+        .innerJoinAndSelect("doc.user", "user")
+        .getMany()
 
-    return documents;
-  }
+      if (data) {
+        let docs: documentDto[] = data.map(doc => {
+          return {
+            title: doc.title,
+            content: doc.content,
+            createdAt: doc.createdAt,
+            owner: doc.user.userName
+          }
+        })
 
-  async getSpecificDoc(title: string, pass: string, userName: string){
-    let documents: DocumentEntity | null = await this.docRepo
-    .createQueryBuilder("doc")
-    .innerJoinAndSelect("doc.user", "user")
-    .where("doc.title LIKE :title", { title: `%${title}%` })
-    .getOne();
-
-    if(pass && documents){
-      let encrypt = await bcrypt.hash(pass, 12);
-      console.log(encrypt);
-      let comparePass = await bcrypt.compare(pass, documents!.password);
-      if(comparePass){
-        let user: UserEntity | null = await this.userRepo
-        .createQueryBuilder()
-        .select()
-        .where("user_name = :user", {user: userName})
-        .getOne();
-
-        if(!user){
-          throw new HttpException("user not found", 404);
-        } else {
-          await this.registrerAction(documents, user, "OPEN");
-          return documents as documentDto;
-        }
+        return docs;
+      } else {
+        return null;
       }
-    } else {
-      throw new HttpException("document not found", 404);
+    } catch (error: any) {
+      throw new HttpException(error.message, 500);
     }
   }
 
-  private async registrerAction(document: DocumentEntity, user: UserEntity, action: string){
-    
+  async getSpecificDoc(title: string, pass: string, userName: string) {
+    let documents: DocumentEntity | null = await this.docRepo
+      .createQueryBuilder("doc")
+      .innerJoinAndSelect("doc.user", "user")
+      .where("doc.title LIKE :title", { title: `%${title}%` })
+      .getOne();
+
+    // if (pass && documents) {
+    //   let encrypt = await bcrypt.hash(pass, 12);
+    //   console.log(encrypt);
+    //   let comparePass = await bcrypt.compare(pass, documents!.password);
+    //   if (comparePass) {
+    //     let user: UserEntity | null = await this.userRepo
+    //       .createQueryBuilder()
+    //       .select()
+    //       .where("user_name = :user", { user: userName })
+    //       .getOne();
+
+    //     if (!user) {
+    //       throw new HttpException("user not found", 404);
+    //     } else {
+    //       await this.registrerAction(documents, user, "OPEN");
+    //       return documents as documentDto;
+    //     }
+    //   }
+    // } else {
+    //   throw new HttpException("document not found", 404);
+    // }
+  }
+
+  private async registrerAction(document: DocumentEntity, user: UserEntity, action: string) {
+
     return await this.actions.createQueryBuilder()
-    .insert()
-    .into(DocsActionsEntity)
-    .values({
-      doc: document,
-      user: user,
-      action: action
-    })
-    .execute();
+      .insert()
+      .into(DocsActionsEntity)
+      .values({
+        doc: document,
+        user: user,
+        action: action
+      })
+      .execute();
   }
 
 }

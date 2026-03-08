@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpException, Query, Req, UseGuards } from '@nestjs/common';
 import { DocumentService } from './document-service.service';
 import { DocumentEntity } from 'core/entities/document.entity';
 import { documentDto } from 'core/dtos/document.dto';
@@ -10,10 +10,13 @@ export class DocumentController {
   constructor(private readonly DocumentService: DocumentService) {}
 
   @Get()
-  async documents(@Req() req): Promise<DocumentEntity[]> 
-  {
-    console.log(req.info);
-    return await this.DocumentService.getDocuments();
+  async documents(@Req() req): Promise<documentDto[]> {
+    let response: documentDto[] | null = await this.DocumentService.getDocuments();
+    if(response){
+      return response;
+    } else {
+      throw new HttpException("no docs founded", 404);
+    }
   }
 
   @Get("get-specific-doc")
