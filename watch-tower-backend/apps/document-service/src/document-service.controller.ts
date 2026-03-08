@@ -15,7 +15,7 @@ export class DocumentController {
     if(response){
       return response;
     } else {
-      throw new HttpException("no docs founded", 404);
+      throw new HttpException("no docs founded", 400);
     }
   }
 

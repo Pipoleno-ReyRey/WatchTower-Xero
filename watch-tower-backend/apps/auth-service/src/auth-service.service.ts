@@ -35,11 +35,11 @@ export class AuthService {
           ...response,
           token: this.jwt.sign(response)
         }
-      } else if(user.status === 404) {
-        throw new HttpException("not found", 404);
+      } else if(user.status === 401) {
+        throw new UnauthorizedException();
       }
     } catch (error: any) {
-      throw new HttpException(error.message, 404);
+      throw new HttpException(error.message, 500);
     }
   }
 

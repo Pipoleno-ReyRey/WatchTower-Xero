@@ -26,7 +26,7 @@ export class UsersController {
   async allRoles(@Headers("token") token: string){
     let response = await this.gatewayService.getRoles(token);
     if(!response){
-      throw new HttpException("roles not found", 404);
+      throw new HttpException("roles not found", 400);
     } else {
       return response;
     }
@@ -36,7 +36,7 @@ export class UsersController {
   async allUsers(@Headers("token") token: string){
     let response = await this.gatewayService.getUsers(token);
     if(!response){
-      throw new HttpException("roles not found", 404);
+      throw new HttpException("roles not found", 400);
     } else {
       return response;
     }

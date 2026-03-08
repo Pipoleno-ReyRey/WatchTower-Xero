@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { LoginDto } from 'core/dtos/login.dto';
 import { signIn } from 'core/dtos/sign.dto';
 import { UserDto } from 'core/dtos/user.dto';
@@ -26,11 +26,11 @@ export class UsersGatewayService {
 
       if (response.ok) {
         return await response.json();
-      } else if(response.status === 404) {
-        throw new HttpException("not found", 404);
+      } else if(response.status === 401) {
+        throw new UnauthorizedException();
       }
     } catch (error: any) {
-      throw new HttpException(error.message, 404);
+      throw new UnauthorizedException();
     }
   }
 
