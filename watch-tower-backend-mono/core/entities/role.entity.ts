@@ -1,0 +1,19 @@
+import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { RoleUserEntity } from "./role-user.entity";
+
+@Entity("roles")
+export class RoleEntity {
+  
+    @PrimaryGeneratedColumn({name: "id"})
+    id!: number;
+
+    @Column({name: "role", type: "varchar", length: 100, nullable: false, unique: true})
+    role!: string;
+
+    @Column({name: "description", type: "text", nullable: true})
+    description!: string;
+
+    @OneToMany(() => RoleUserEntity, roleUser => roleUser.role)
+    @JoinColumn({name: "id", referencedColumnName: "role"})
+    users?: RoleUserEntity[];
+}
