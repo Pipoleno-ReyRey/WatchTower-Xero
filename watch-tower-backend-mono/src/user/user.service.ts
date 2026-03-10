@@ -12,6 +12,7 @@ import { SessionEntity } from 'core/entities/sessions.entity';
 import { UserEntity } from 'core/entities/user.entity';
 import bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
@@ -19,7 +20,8 @@ export class UserService {
     @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
     @InjectRepository(RoleUserEntity) private roleUserRepository: Repository<RoleUserEntity>,
     @InjectRepository(RoleEntity) private roleRepository: Repository<RoleEntity>,
-    @InjectRepository(SessionEntity) private sessionRepository: Repository<SessionEntity>
+    @InjectRepository(SessionEntity) private sessionRepository: Repository<SessionEntity>,
+    private readonly jwt: JwtService
   ) { }
 
   async createUser(sign: signIn): Promise<LoginDto | null> {
@@ -95,13 +97,18 @@ export class UserService {
 
         let comparePassword = await bcrypt.compare(user.password, login.password);
         let pin = login.pin === user.pin ? true : false;
+
         if (comparePassword && pin) {
           // await this.createSession(user, login, "LOGIN")
-          return {
+          let response = {
             userName: login.userName,
             email: login.email,
             role: roles
           };
+          return {
+            ...response,
+            token: this.jwt.sign(response)
+          }
         } else {
           return null;
         }
@@ -109,7 +116,7 @@ export class UserService {
         return null;
       }
     } catch (error: any) {
-      return error.message as string;
+      throw new HttpException(error.message, 500);
     }
 
   }
