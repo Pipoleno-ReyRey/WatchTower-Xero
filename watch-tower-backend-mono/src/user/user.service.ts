@@ -82,7 +82,7 @@ export class UserService {
   async getUser(user: LoginDto): Promise<UserDto | any> {
 
     try {
-      
+
       let login: UserEntity | null = await this.userRepository.createQueryBuilder("uu")
         .innerJoinAndSelect("uu.roles", "roles")
         .where("uu.user_name = :userName", { userName: user.user })
@@ -141,7 +141,7 @@ export class UserService {
       let users: UserEntity[] | null = await this.userRepository
         .createQueryBuilder("uu")
         .innerJoinAndSelect("uu.roles", "roles")
-        .getMany();      
+        .getMany();
 
       if (users.length < 0) {
         return;
@@ -176,7 +176,26 @@ export class UserService {
     return data;
   }
 
-  // async createRole(): Promise<>{
+  async createRole(create: roleDto): Promise<roleDto | null> {
+    try {
+      let response = await this.roleRepository
+        .createQueryBuilder()
+        .insert()
+        .values({
+          role: create.role,
+          description: create.description
+        })
+        .execute();
 
-  // }
+        return {
+          id: response.raw[0].id,
+          role: response.raw[0].role,
+          description: response.raw[0].description
+        }
+    }catch(error: any){
+      throw new HttpException(error.message, 500);
+    }
+
+
+  }
 }

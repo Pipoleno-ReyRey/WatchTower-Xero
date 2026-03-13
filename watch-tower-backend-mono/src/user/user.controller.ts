@@ -4,6 +4,7 @@ import { signIn } from 'core/dtos/sign.dto';
 import { AuthGuard } from 'core/guards/auth.guard';
 import { RoleEntity } from 'core/entities/role.entity';
 import { UserService } from './user.service';
+import { roleDto } from 'core/dtos/role.dto';
 
 @Controller()
 export class UserController {
@@ -44,5 +45,11 @@ export class UserController {
   @UseGuards(AuthGuard)
   async allRoles(): Promise<RoleEntity[]>{
     return await this.userService.getAllRoles();
+  }
+
+  @Post("role")
+  @UseGuards(AuthGuard)
+  async postRole(@Body() role: roleDto){
+    return await this.userService.createRole(role);
   }
 }

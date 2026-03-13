@@ -50,27 +50,22 @@ export class DocumentsService {
       .where("doc.title LIKE :title", { title: `%${title}%` })
       .getOne();
 
-    // if (pass && documents) {
-    //   let encrypt = await bcrypt.hash(pass, 12);
-    //   console.log(encrypt);
-    //   let comparePass = await bcrypt.compare(pass, documents!.password);
-    //   if (comparePass) {
-    //     let user: UserEntity | null = await this.userRepo
-    //       .createQueryBuilder()
-    //       .select()
-    //       .where("user_name = :user", { user: userName })
-    //       .getOne();
+    if(documents?.password == pass){
+      let user: UserEntity | null = await this.userRepo
+      .createQueryBuilder()
+      .select()
+      .where("user_name = :user", {user: userName})
+      .getOne();
 
-    //     if (!user) {
-    //       throw new HttpException("user not found", 404);
-    //     } else {
-    //       await this.registrerAction(documents, user, "OPEN");
-    //       return documents as documentDto;
-    //     }
-    //   }
-    // } else {
-    //   throw new HttpException("document not found", 404);
-    // }
+      await this.registrerAction(documents, user!, "OPEN")
+      return {
+        title: documents.title,
+        content: documents.content,
+        owner: documents.user.userName,
+        createdAt: documents.createdAt,
+        updatedAt: documents.updatedAt
+      }
+    }
   }
 
   private async registrerAction(document: DocumentEntity, user: UserEntity, action: string) {

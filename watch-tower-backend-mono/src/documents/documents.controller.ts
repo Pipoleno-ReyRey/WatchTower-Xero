@@ -1,4 +1,4 @@
-import { Controller, Get, HttpException, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { DocumentsService } from './documents.service';
 import { AuthGuard } from 'core/guards/auth.guard';
 import { documentDto } from 'core/dtos/document.dto';
@@ -14,8 +14,8 @@ export class DocumentsController {
     return response;
   }
 
-  @Get()
-  async getDoc(@Query("title") title: string, @Query("pass") pass: string, @Req() req){
-    return await this.documentsService.getSpecificDoc(title, pass, req.info.userName);
+  @Post()
+  async getDoc(@Body() doc: any, @Req() req){
+    return await this.documentsService.getSpecificDoc(doc.title, doc.pass, req.info.userName);
   }
 }
