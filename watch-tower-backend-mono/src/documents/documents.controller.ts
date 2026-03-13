@@ -9,13 +9,9 @@ export class DocumentsController {
   constructor(private readonly documentsService: DocumentsService) {}
 
   @Get("all")
-  async documents(@Req() req): Promise<documentDto[]> {
+  async documents(@Req() req): Promise<documentDto[] | null> {
     let response: documentDto[] | null = await this.documentsService.getDocuments();
-    if(response){
-      return response;
-    } else {
-      throw new HttpException("no docs founded", 400);
-    }
+    return response;
   }
 
   @Get()

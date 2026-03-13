@@ -5,6 +5,13 @@ services:
       context: .
       dockerfile: ./Dockerfile
     environment:
-      NODE_ENV: production
+      - GATEWAY_PORT=8000
+      - DB_HOST=host.docker.internal
+      - DB_PORT=5432
+      - DB_USER=zero-trust
+      - DB_PASSWORD=066512
+      - DB_NAME=zerotrustdb
+      - TOKEN_SECRET=bmV3LXNlY3JldC1rZXktd2F0Y2h0b3dlci14ZXJvLTIwMjYtc2VjdXJl
+
     ports:
       - 8000:8000
