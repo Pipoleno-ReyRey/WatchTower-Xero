@@ -35,7 +35,7 @@ export class UserController {
     }
   }
 
-  @Get("/all")
+  @Get("user/all")
   @UseGuards(AuthGuard)
   async all(){
     return await this.userService.getAllUsers();

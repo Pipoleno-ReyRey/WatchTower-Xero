@@ -7,6 +7,7 @@ import { entitiesDb } from 'core/envs/db-entities.env';
 import { UserModule } from './user/user.module';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { DocumentsModule } from './documents/documents.module';
+import { AuditModule } from './audit/audit.module';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { DocumentsModule } from './documents/documents.module';
     TypeOrmModule.forFeature([...entitiesDb]),
     UserModule,
     DocumentsModule,
-    JwtModule],
+    JwtModule,
+    AuditModule],
   controllers: [AppController],
   providers: [AppService],
 })

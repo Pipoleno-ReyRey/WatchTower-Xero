@@ -50,12 +50,12 @@ export class DocumentsService {
       .where("doc.title LIKE :title", { title: `%${title}%` })
       .getOne();
 
-    if(documents?.password == pass){
+    if (documents?.password == pass) {
       let user: UserEntity | null = await this.userRepo
-      .createQueryBuilder()
-      .select()
-      .where("user_name = :user", {user: userName})
-      .getOne();
+        .createQueryBuilder()
+        .select()
+        .where("user_name = :user", { user: userName })
+        .getOne();
 
       await this.registrerAction(documents, user!, "OPEN")
       return {
@@ -70,15 +70,23 @@ export class DocumentsService {
 
   private async registrerAction(document: DocumentEntity, user: UserEntity, action: string) {
 
-    return await this.actions.createQueryBuilder()
-      .insert()
-      .into(DocsActionsEntity)
-      .values({
-        doc: document,
-        user: user,
-        action: action
-      })
-      .execute();
+    try {
+      return await this.actions.createQueryBuilder()
+        .insert()
+        .into(DocsActionsEntity)
+        .values({
+          doc: document,
+          user: user,
+          action: action
+        })
+        .execute();
+    } catch (error: any) {
+      throw new HttpException(error.message, 500);
+    }
+  }
+
+  async getActions() {
+
   }
 
 }

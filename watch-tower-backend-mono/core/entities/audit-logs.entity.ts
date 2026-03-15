@@ -1,5 +1,5 @@
 import { Session } from "@nestjs/common";
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { SessionEntity } from "./sessions.entity";
 import { UserEntity } from "./user.entity";
 
@@ -9,22 +9,15 @@ export class AuditLogEntity {
     @PrimaryGeneratedColumn({name: "id"})
     id!: number;
 
-    @Column({name: "user_name", type: "varchar", length: 50, nullable: false})
-    userName!: string;
-
-    @OneToOne(() => UserEntity, user => user.userName)
-    @JoinColumn({referencedColumnName: "user_name"})
+    @ManyToOne(() => UserEntity, user => user.audit)
+    @JoinColumn({referencedColumnName: "userName", name: "user"})
     user!: UserEntity;
-
-    @Column({name: "session", type: "int", nullable: false})
-    sessionId!: number;
-
-    @OneToOne(() => SessionEntity, session => session.id)
-    @JoinColumn({referencedColumnName: "id"})
-    session!: SessionEntity;
 
     @Column({name: "action", type: "varchar", length: 255, nullable: false})
     action!: string;
+
+    @Column({name: "ip", type: "varchar", length: 255, nullable: false})
+    ip!: string;
 
     @Column({name: "date", type: "timestamp", default: () => "CURRENT_TIMESTAMP", nullable: false})
     date!: Date;

@@ -13,6 +13,8 @@ import { UserEntity } from 'core/entities/user.entity';
 import bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
+import { AuditLogEntity } from 'core/entities/audit-logs.entity';
+import { use } from 'passport';
 
 @Injectable()
 export class UserService {
@@ -21,6 +23,7 @@ export class UserService {
     @InjectRepository(RoleUserEntity) private roleUserRepository: Repository<RoleUserEntity>,
     @InjectRepository(RoleEntity) private roleRepository: Repository<RoleEntity>,
     @InjectRepository(SessionEntity) private sessionRepository: Repository<SessionEntity>,
+    @InjectRepository(AuditLogEntity) private auditRepo: Repository<AuditLogEntity>,
     private readonly jwt: JwtService
   ) { }
 
@@ -89,6 +92,11 @@ export class UserService {
         .orWhere("uu.email = :email", { email: user.email })
         .getOne();
 
+      let crypt = await bcrypt.hash(user.password, 10);
+      console.log(crypt);
+
+      console.log(login);
+
       if (login) {
         let roles: roleDto[] = (await this.roleRepository.createQueryBuilder()
           .select(["id as id", "role as role"])
@@ -141,6 +149,7 @@ export class UserService {
       let users: UserEntity[] | null = await this.userRepository
         .createQueryBuilder("uu")
         .innerJoinAndSelect("uu.roles", "roles")
+        .innerJoinAndSelect("uu.audit", "audit")
         .getMany();
 
       if (users.length < 0) {
@@ -148,6 +157,8 @@ export class UserService {
       }
 
       let response: UserDto[] = users.map(user => {
+        let risk = user.audit.filter(audit => audit.action == "LOGIN_FAILED").length * 5;
+        
         return {
           userName: user.userName,
           email: user.email,
@@ -156,7 +167,8 @@ export class UserService {
             return {
               role: roles.role.role
             }
-          })
+          }),
+          risk: `${risk}%`
         }
       });
 
@@ -178,24 +190,17 @@ export class UserService {
 
   async createRole(create: roleDto): Promise<roleDto | null> {
     try {
-      let response = await this.roleRepository
-        .createQueryBuilder()
-        .insert()
-        .values({
-          role: create.role,
-          description: create.description
-        })
-        .execute();
+      let role: RoleEntity = new RoleEntity();
+      role.role = create.role!;
+      role.description = create.description!;
+      return await this.roleRepository.save(role);
 
-        return {
-          id: response.raw[0].id,
-          role: response.raw[0].role,
-          description: response.raw[0].description
-        }
-    }catch(error: any){
+    } catch (error: any) {
       throw new HttpException(error.message, 500);
     }
 
 
   }
+
+
 }
