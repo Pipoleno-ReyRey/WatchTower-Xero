@@ -1,4 +1,6 @@
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { UserRoundCog } from "lucide-react";
+import type { IUser } from "../../schemas/user";
+
 import {
   Table,
   TableBody,
@@ -7,84 +9,50 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import { Button } from "../ui/button";
+import { useStore } from "../../store/appStore";
 
-const items = [
-  {
-    id: "1",
-    name: "Philip George",
-    src: "https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-1.png",
-    fallback: "PG",
-    email: "philipgeorge20@gmail.com",
-    location: "Mumbai, India",
-    status: "Active",
-    balance: "$10,696.00",
-  },
-  {
-    id: "2",
-    name: "Tiana Curtis",
-    src: "https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-2.png",
-    fallback: "TC",
-    email: "tiana12@yahoo.com",
-    location: "New York, US",
-    status: "applied",
-    balance: "$0.00",
-  },
-  {
-    id: "3",
-    name: "Jaylon Donin",
-    src: "https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-3.png",
-    fallback: "JD",
-    email: "jaylon23d.@outlook.com",
-    location: "Washington, US",
-    status: "Active",
-    balance: "$569.00",
-  },
-  {
-    id: "4",
-    name: "Kim Yim",
-    src: "https://cdn.shadcnstudio.com/ss-assets/avatar/avatar-4.png",
-    fallback: "KY",
-    email: "kim96@gmail.com",
-    location: "Busan, South Korea",
-    status: "Inactive",
-    balance: "-$506.90",
-  },
-];
+interface Props {
+  users: IUser[];
+}
 
-export const UserTable = () => {
+export const UserTable = ({ users }: Props) => {
+const openEdit = useStore((s) => s.openEdit);
+
   return (
     <div className="w-full">
       <div className="[&>div]:rounded-sm [&>div]:border">
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
-              <TableHead>Usuario</TableHead>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Email</TableHead>
               <TableHead>Rol</TableHead>
-              <TableHead>Departamento</TableHead>
-              <TableHead>Status</TableHead>
-              {/* <TableHead className="text-right">Balance</TableHead> */}
-              <TableHead className="">Accion</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead></TableHead>
             </TableRow>
           </TableHeader>
+
           <TableBody>
-            {items.map((item) => (
+            {users.map((item) => (
               <TableRow key={item.id}>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarImage src={item.src} alt={item.fallback} />
-                      <AvatarFallback className="text-xs">
-                        {item.fallback}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="font-medium">{item.name}</div>
-                  </div>
-                </TableCell>
+                <TableCell className="font-medium">{item.name}</TableCell>
+
                 <TableCell>{item.email}</TableCell>
-                <TableCell>{item.location}</TableCell>
+
+                <TableCell>{item.role.role}</TableCell>
+
                 <TableCell>{item.status}</TableCell>
-                {/* <TableCell className="text-right">{item.balance}</TableCell> */}
-                <TableCell className="">...</TableCell>
+
+                <TableCell>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => openEdit(item)}
+                  >
+                    <UserRoundCog size={18} />
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
