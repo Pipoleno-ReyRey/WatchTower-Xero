@@ -4,12 +4,13 @@ import { signIn } from 'core/dtos/sign.dto';
 import { AuthGuard } from 'core/guards/auth.guard';
 import { RoleEntity } from 'core/entities/role.entity';
 import { UserService } from './user.service';
+import { roleDto } from 'core/dtos/role.dto';
 
-@Controller("user")
+@Controller()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post("/login-user-validation")
+  @Post("/login")
   async loginUser(@Body() login: LoginDto) {
     let response = await this.userService.getUser(login);
     if(!response){
@@ -24,7 +25,7 @@ export class UserController {
     return "Change password endpoint";
   }
 
-  @Post("/sign-in-user")
+  @Post("/sign-in")
   async signUp(@Body() sign: signIn) {
     let response = await this.userService.createUser(sign)
     if(!response){
@@ -34,7 +35,7 @@ export class UserController {
     }
   }
 
-  @Get("/all")
+  @Get("user/all")
   @UseGuards(AuthGuard)
   async all(){
     return await this.userService.getAllUsers();
@@ -44,5 +45,11 @@ export class UserController {
   @UseGuards(AuthGuard)
   async allRoles(): Promise<RoleEntity[]>{
     return await this.userService.getAllRoles();
+  }
+
+  @Post("role")
+  @UseGuards(AuthGuard)
+  async postRole(@Body() role: roleDto){
+    return await this.userService.createRole(role);
   }
 }

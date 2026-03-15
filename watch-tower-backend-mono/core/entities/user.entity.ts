@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { RoleUserEntity } from "./role-user.entity";
 import { DocumentEntity } from "./document.entity";
+import { AuditLogEntity } from "./audit-logs.entity";
 
 @Entity("users")
 export class UserEntity {
@@ -45,12 +46,12 @@ export class UserEntity {
     @JoinColumn({name: "user_name"})
     roles!: RoleUserEntity[];
 
-    // @OneToMany(() => PoliciesUserEntity, policiesUser => policiesUser.user)
-    // @JoinColumn({name: "user_name"})
-    // policies!: PoliciesUserEntity[];
-
     @OneToMany(() => DocumentEntity, document => document.user)
     @JoinColumn({name: "user_name"})
     documents?: DocumentEntity[];
+
+    @OneToMany(() => AuditLogEntity, audit => audit.user)
+    @JoinColumn({name: "user_name"})
+    audit!: AuditLogEntity[];
 
 }

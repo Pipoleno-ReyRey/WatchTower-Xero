@@ -14,5 +14,6 @@ export const entitiesDb = [
     RoleUserEntity,
     DocumentEntity,
     SessionEntity,
-    DocsActionsEntity
+    DocsActionsEntity,
+    AuditLogEntity
 ]

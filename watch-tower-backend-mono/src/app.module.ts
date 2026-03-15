@@ -6,7 +6,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { entitiesDb } from 'core/envs/db-entities.env';
 import { UserModule } from './user/user.module';
 import { JwtModule, JwtService } from '@nestjs/jwt';
-import { GatewayModule } from './gateway/gateway.module';
+import { DocumentsModule } from './documents/documents.module';
+import { AuditModule } from './audit/audit.module';
 
 @Module({
   imports: [
@@ -22,8 +23,9 @@ import { GatewayModule } from './gateway/gateway.module';
     }),
     TypeOrmModule.forFeature([...entitiesDb]),
     UserModule,
-    GatewayModule,
-  JwtModule],
+    DocumentsModule,
+    JwtModule,
+    AuditModule],
   controllers: [AppController],
   providers: [AppService],
 })

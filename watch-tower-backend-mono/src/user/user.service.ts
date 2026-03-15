@@ -12,6 +12,9 @@ import { SessionEntity } from 'core/entities/sessions.entity';
 import { UserEntity } from 'core/entities/user.entity';
 import bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
+import { AuditLogEntity } from 'core/entities/audit-logs.entity';
+import { use } from 'passport';
 
 @Injectable()
 export class UserService {
@@ -19,7 +22,9 @@ export class UserService {
     @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
     @InjectRepository(RoleUserEntity) private roleUserRepository: Repository<RoleUserEntity>,
     @InjectRepository(RoleEntity) private roleRepository: Repository<RoleEntity>,
-    @InjectRepository(SessionEntity) private sessionRepository: Repository<SessionEntity>
+    @InjectRepository(SessionEntity) private sessionRepository: Repository<SessionEntity>,
+    @InjectRepository(AuditLogEntity) private auditRepo: Repository<AuditLogEntity>,
+    private readonly jwt: JwtService
   ) { }
 
   async createUser(sign: signIn): Promise<LoginDto | null> {
@@ -80,12 +85,14 @@ export class UserService {
   async getUser(user: LoginDto): Promise<UserDto | any> {
 
     try {
-      
+
       let login: UserEntity | null = await this.userRepository.createQueryBuilder("uu")
         .innerJoinAndSelect("uu.roles", "roles")
         .where("uu.user_name = :userName", { userName: user.user })
         .orWhere("uu.email = :email", { email: user.email })
         .getOne();
+
+      let crypt = await bcrypt.hash(user.password, 10);
 
       if (login) {
         let roles: roleDto[] = (await this.roleRepository.createQueryBuilder()
@@ -95,13 +102,18 @@ export class UserService {
 
         let comparePassword = await bcrypt.compare(user.password, login.password);
         let pin = login.pin === user.pin ? true : false;
+
         if (comparePassword && pin) {
           // await this.createSession(user, login, "LOGIN")
-          return {
+          let response = {
             userName: login.userName,
             email: login.email,
             role: roles
           };
+          return {
+            ...response,
+            token: this.jwt.sign(response)
+          }
         } else {
           return null;
         }
@@ -109,7 +121,7 @@ export class UserService {
         return null;
       }
     } catch (error: any) {
-      return error.message as string;
+      throw new HttpException(error.message, 500);
     }
 
   }
@@ -134,13 +146,16 @@ export class UserService {
       let users: UserEntity[] | null = await this.userRepository
         .createQueryBuilder("uu")
         .innerJoinAndSelect("uu.roles", "roles")
-        .getMany();      
+        .innerJoinAndSelect("uu.audit", "audit")
+        .getMany();
 
       if (users.length < 0) {
         return;
       }
 
       let response: UserDto[] = users.map(user => {
+        let risk = user.audit.filter(audit => audit.action == "LOGIN_FAILED").length * 5;
+        
         return {
           userName: user.userName,
           email: user.email,
@@ -149,7 +164,8 @@ export class UserService {
             return {
               role: roles.role.role
             }
-          })
+          }),
+          risk: `${risk}%`
         }
       });
 
@@ -169,7 +185,19 @@ export class UserService {
     return data;
   }
 
-  // async createRole(): Promise<>{
+  async createRole(create: roleDto): Promise<roleDto | null> {
+    try {
+      let role: RoleEntity = new RoleEntity();
+      role.role = create.role!;
+      role.description = create.description!;
+      return await this.roleRepository.save(role);
 
-  // }
+    } catch (error: any) {
+      throw new HttpException(error.message, 500);
+    }
+
+
+  }
+
+
 }
