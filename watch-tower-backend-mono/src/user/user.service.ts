@@ -93,9 +93,6 @@ export class UserService {
         .getOne();
 
       let crypt = await bcrypt.hash(user.password, 10);
-      console.log(crypt);
-
-      console.log(login);
 
       if (login) {
         let roles: roleDto[] = (await this.roleRepository.createQueryBuilder()
