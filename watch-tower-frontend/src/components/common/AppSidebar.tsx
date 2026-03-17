@@ -1,12 +1,4 @@
-import {
-  LayoutDashboard,
-  Users,
-  ChevronLeft,
-  ChevronRight,
-  Badge,
-  Eye,
-  LogOut,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Badge, Eye, LogOut } from "lucide-react";
 
 import {
   Sidebar,
@@ -23,11 +15,8 @@ import {
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 
-import { Link } from "react-router-dom";
-const navItems = [
-  { path: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { path: "user", label: "Users", icon: Users },
-];
+import { NavLink } from "react-router-dom";
+import { navItems } from "../../routes/nav-items";
 
 export default function AppSidebar() {
   const { state, toggleSidebar } = useSidebar();
@@ -39,7 +28,7 @@ export default function AppSidebar() {
   };
 
   return (
-    <Sidebar  collapsible="icon" className="border-none">
+    <Sidebar collapsible="icon" className="border-none">
       {/* LOGO */}
       <SidebarHeader>
         <div className="flex h-16 items-center gap-3 px-3">
@@ -62,20 +51,24 @@ export default function AppSidebar() {
 
       {/* NAVIGATION */}
       <SidebarContent>
-        <SidebarMenu className="px-2 ">
+        <SidebarMenu className="px-2">
           {navItems.map((item) => {
             const Icon = item.icon;
+
             return (
               <SidebarMenuItem key={item.path}>
-                <Link to={item.path}>
-                  <SidebarMenuButton
-                    tooltip={item.label}
-                    // isActive={active === item.path}
-                  >
-                    <Icon className="h-4 w-4" />
-                    <span>{item.label}</span>
-                  </SidebarMenuButton>
-                </Link>
+                <NavLink
+                  to={item.path}
+                  end={false} // permite rutas hijas
+                  className="w-full"
+                >
+                  {({ isActive }) => (
+                    <SidebarMenuButton tooltip={item.label} isActive={isActive}>
+                      <Icon className="h-4 w-4" />
+                      <span>{item.label}</span>
+                    </SidebarMenuButton>
+                  )}
+                </NavLink>
               </SidebarMenuItem>
             );
           })}
@@ -97,6 +90,7 @@ export default function AppSidebar() {
 
             <div className="flex flex-col">
               <span className="text-sm font-medium">{currentUser.name}</span>
+
               <Badge className="mt-0.5 w-fit border-primary/30 px-1.5 py-0 text-[10px] text-primary">
                 {currentUser.role.toUpperCase()}
               </Badge>

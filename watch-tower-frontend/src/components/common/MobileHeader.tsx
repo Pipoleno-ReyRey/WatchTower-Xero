@@ -2,12 +2,12 @@ import { Menu } from "lucide-react";
 import { Button } from "../ui/button";
 import { useSidebar } from "../ui/sidebar";
 
-export  function MobileHeader() {
-  const { toggleSidebar } = useSidebar();
+export function MobileHeader() {
+  const { setOpenMobile } = useSidebar();
 
   return (
     <header className="flex h-14 items-center border-b bg-background px-4 md:hidden">
-      <Button variant="ghost" size="icon" onClick={toggleSidebar}>
+      <Button variant="ghost" size="icon" onClick={() => setOpenMobile(true)}>
         <Menu className="h-5 w-5" />
       </Button>
 
