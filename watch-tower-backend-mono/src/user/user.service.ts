@@ -199,5 +199,52 @@ export class UserService {
 
   }
 
+  async updateUser(user: string, password?: string, pin?: string){
+    if(password && !pin){
+      let passCrypt: string = await bcrypt.hash(password, 10);
+      try {
+        await this.userRepository
+        .createQueryBuilder()
+        .update(UserEntity)
+        .set({
+          password: passCrypt
+        })
+        .where("user_name = :user", {user: user})
+        .execute();
+      } catch (error: any) {
+        throw new HttpException(error.message, 500)
+      }
+    } else if(pin && !password){
+      try {
+        await this.userRepository
+        .createQueryBuilder()
+        .update(UserEntity)
+        .set({
+          pin: pin
+        })
+        .where("user_name = :user", {user: user})
+        .execute();
+      } catch (error: any) {
+        throw new HttpException(error.message, 500)
+      }
+
+    } else if(pin && password){
+      let passCrypt: string = await bcrypt.hash(password, 10);
+      try {
+        await this.userRepository
+        .createQueryBuilder()
+        .update(UserEntity)
+        .set({
+          password: passCrypt,
+          pin: pin
+        })
+        .where("user_name = :user", {user: user})
+        .execute();
+      } catch (error: any) {
+        throw new HttpException(error.message, 500)
+      }
+    }
+  }
+
 
 }
