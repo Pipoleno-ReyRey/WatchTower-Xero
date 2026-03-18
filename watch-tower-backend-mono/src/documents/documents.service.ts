@@ -92,7 +92,8 @@ export class DocumentsService {
     document.title = doc.title;
     document.content = doc.content;
     document.password = crypt;
-    let user = await this.userRepo.findOne({
+    try {
+      let user = await this.userRepo.findOne({
       where: {
         userName: doc.owner
       }
@@ -109,7 +110,10 @@ export class DocumentsService {
         updatedAt: docs.updatedAt
       };
     } else {
-      throw new HttpException("user not found", 401);
+      throw new UnauthorizedException();
+    }
+    } catch (error: any) {
+      throw new HttpException(error.mesage, 500);
     }
     
   }
