@@ -1,10 +1,12 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { documentDto } from 'core/dtos/document.dto';
+import { error } from 'console';
+import { createDocDTO, documentDto } from 'core/dtos/document.dto';
 import { DocsActionsEntity } from 'core/entities/docs_actions.entity';
 import { DocumentEntity } from 'core/entities/document.entity';
 import { UserEntity } from 'core/entities/user.entity';
-import bcrypt from 'node_modules/bcryptjs/';
+import bcrypt from 'bcryptjs';
+import { Interface } from 'readline';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -27,11 +29,10 @@ export class DocumentsService {
         let docs: documentDto[] = data.map(doc => {
           return {
             title: doc.title,
-            content: doc.content,
             createdAt: doc.createdAt,
             updatedAt: doc.updatedAt,
             owner: doc.user.userName
-          }
+          } as documentDto;
         })
 
         return docs;
@@ -85,8 +86,36 @@ export class DocumentsService {
     }
   }
 
-  async getActions() {
+  async createDocument(doc: createDocDTO): Promise<documentDto> {
+    let crypt: string = await bcrypt.hash(doc.pass, 10);
+    let document: DocumentEntity = new DocumentEntity();
+    document.title = doc.title;
+    document.content = doc.content;
+    document.password = crypt;
+    try {
+      let user = await this.userRepo.findOne({
+      where: {
+        userName: doc.owner
+      }
+    })
 
+    if(user){
+      document.user = user;
+
+      let docs: DocumentEntity = await this.docRepo.save(document);
+      return {
+        title: docs.title,
+        owner: docs.user.userName,
+        createdAt: docs.createdAt,
+        updatedAt: docs.updatedAt
+      };
+    } else {
+      throw new UnauthorizedException();
+    }
+    } catch (error: any) {
+      throw new HttpException(error.mesage, 500);
+    }
+    
   }
 
 }

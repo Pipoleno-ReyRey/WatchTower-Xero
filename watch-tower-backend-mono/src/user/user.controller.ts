@@ -20,9 +20,9 @@ export class UserController {
     }
   }
 
-  @Patch("/change-password")
-  async changePassword() {
-    return "Change password endpoint";
+  @Patch("/change")
+  async changePassword(@Body() data: {password?: string; pin?: string}, @Req() req) {
+    return await this.userService.updateUser(req.info.userName, data.password, data.pin);
   }
 
   @Post("/sign-in")

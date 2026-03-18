@@ -6,3 +6,10 @@ export class documentDto {
     updatedAt!: Date;
     owner!: string;
 }
+
+export class createDocDTO{
+    title!: string;
+    owner?: string;
+    content!: string;
+    pass!: string;
+}

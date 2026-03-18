@@ -1,7 +1,7 @@
 import { Body, Controller, Get, HttpException, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { DocumentsService } from './documents.service';
 import { AuthGuard } from 'core/guards/auth.guard';
-import { documentDto } from 'core/dtos/document.dto';
+import { createDocDTO, documentDto } from 'core/dtos/document.dto';
 
 @Controller("doc")
 @UseGuards(AuthGuard)
@@ -17,5 +17,11 @@ export class DocumentsController {
   @Post()
   async getDoc(@Body() doc: any, @Req() req){
     return await this.documentsService.getSpecificDoc(doc.title, doc.pass, req.info.userName);
+  }
+
+  @Post("/create")
+  async createDoc(@Body() doc: createDocDTO, @Req() req){
+    doc.owner = req.info.userName;
+    return await this.documentsService.createDocument(doc)
   }
 }
