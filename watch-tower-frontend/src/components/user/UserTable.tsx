@@ -17,7 +17,7 @@ interface Props {
 }
 
 export const UserTable = ({ users }: Props) => {
-const openEdit = useStore((s) => s.openEdit);
+  const openEdit = useStore((s) => s.openEdit);
 
   return (
     <div className="w-full">
@@ -33,16 +33,18 @@ const openEdit = useStore((s) => s.openEdit);
             </TableRow>
           </TableHeader>
 
-          <TableBody>
+          <TableBody >
             {users.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell className="font-medium">{item.name}</TableCell>
+              <TableRow key={item.userName}>
+                <TableCell className="font-medium">{item.userName}</TableCell>
 
                 <TableCell>{item.email}</TableCell>
 
                 <TableCell>{item.role.role}</TableCell>
 
-                <TableCell>{item.status}</TableCell>
+                <TableCell>
+                  {item.status === true ? "Activo" : "Bloqueado"}
+                </TableCell>
 
                 <TableCell>
                   <Button

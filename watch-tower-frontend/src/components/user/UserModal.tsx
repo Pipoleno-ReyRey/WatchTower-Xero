@@ -56,10 +56,10 @@ export const UserModal = () => {
     mode: "onChange",
     defaultValues: {
       name: "",
-      username: "",
+      userName: "",
       email: "",
-      role: undefined as any,
-      status: "",
+      role: undefined,
+      status: true,
       pin: "",
     },
   });
@@ -121,7 +121,7 @@ export const UserModal = () => {
             {/* username */}
 
             <Controller
-              name="username"
+              name="userName"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
@@ -208,8 +208,8 @@ export const UserModal = () => {
                   <CustomSelect
                     placeholder="Estado"
                     options={statusOptions}
-                    defaultValue={field.value}
-                    onValueChange={field.onChange}
+                    defaultValue={field.value ? "true" : "false"}
+                    onValueChange={(value) => field.onChange(value === "true")}
                   />
 
                   {fieldState.invalid && (

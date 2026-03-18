@@ -3,11 +3,11 @@ import { Navigate, Outlet } from "react-router-dom";
 import { isTokenValid } from "../utils/auth";
 
 export const ProtectedAuthRoute = () => {
-  // const valid = isTokenValid();
+  const valid = isTokenValid();
 
-  // if (valid) {
-  //   return <Navigate to="/dashboard" replace />;
-  // }
+  if (valid) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   return <Outlet />;
 };
