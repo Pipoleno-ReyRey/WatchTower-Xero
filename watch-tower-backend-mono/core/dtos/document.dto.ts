@@ -1,15 +1,19 @@
 import { UserDto } from "./user.dto";
 
 export class documentDto {
+    id!: number
     title!: string;
+    content?: string | null;
     createdAt!: Date;
     updatedAt!: Date;
     owner!: string;
+    hasPass!: boolean;
 }
 
 export class createDocDTO{
     title!: string;
     owner?: string;
     content!: string;
-    pass!: string;
+    hasPass!: boolean;
+    pass?: string | null;
 }

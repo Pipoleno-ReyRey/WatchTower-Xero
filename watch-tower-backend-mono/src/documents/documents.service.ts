@@ -28,10 +28,13 @@ export class DocumentsService {
       if (data) {
         let docs: documentDto[] = data.map(doc => {
           return {
+            id: doc.id,
             title: doc.title,
             createdAt: doc.createdAt,
             updatedAt: doc.updatedAt,
-            owner: doc.user.userName
+            owner: doc.user.userName,
+            hasPass: doc.password ? true : false,
+            content: doc.password ? null : doc.content
           } as documentDto;
         })
 
@@ -44,28 +47,30 @@ export class DocumentsService {
     }
   }
 
-  async getSpecificDoc(title: string, pass: string, userName: string) {
-    let documents: DocumentEntity | null = await this.docRepo
-      .createQueryBuilder("doc")
-      .innerJoinAndSelect("doc.user", "user")
-      .where("doc.title LIKE :title", { title: `%${title}%` })
-      .getOne();
-
-    if (documents?.password == pass) {
-      let user: UserEntity | null = await this.userRepo
-        .createQueryBuilder()
-        .select()
-        .where("user_name = :user", { user: userName })
+  async getSpecificDoc(id: number, pass: string, userName: string) {
+    try {
+      let documents: DocumentEntity | null = await this.docRepo
+        .createQueryBuilder("doc")
+        .innerJoinAndSelect("doc.user", "user")
+        .where("doc.id =:id", { id: id })
         .getOne();
 
-      await this.registrerAction(documents, user!, "OPEN")
-      return {
-        title: documents.title,
-        content: documents.content,
-        owner: documents.user.userName,
-        createdAt: documents.createdAt,
-        updatedAt: documents.updatedAt
+      if (documents?.password == pass) {
+
+        // await this.registrerAction(documents, documents.user!, "OPEN")
+        let response = {
+          id: documents.id,
+          title: documents.title,
+          content: documents.content,
+          owner: documents.user.userName,
+          createdAt: documents.createdAt,
+          updatedAt: documents.updatedAt
+        }
+
+        return response;
       }
+    } catch (error: any) {
+      throw new HttpException(error.message, 500);
     }
   }
 
@@ -87,35 +92,37 @@ export class DocumentsService {
   }
 
   async createDocument(doc: createDocDTO): Promise<documentDto> {
-    let crypt: string = await bcrypt.hash(doc.pass, 10);
+    let crypt = doc.hasPass ? await bcrypt.hash(doc.pass!, 10) : null;
     let document: DocumentEntity = new DocumentEntity();
     document.title = doc.title;
     document.content = doc.content;
     document.password = crypt;
     try {
       let user = await this.userRepo.findOne({
-      where: {
-        userName: doc.owner
+        where: {
+          userName: doc.owner
+        }
+      })
+
+      if (user) {
+        document.user = user;
+
+        let docs: DocumentEntity = await this.docRepo.save(document);
+        return {
+          id: docs.id,
+          title: docs.title,
+          owner: docs.user.userName,
+          createdAt: docs.createdAt,
+          updatedAt: docs.updatedAt,
+          hasPass: doc.hasPass
+        };
+      } else {
+        throw new UnauthorizedException();
       }
-    })
-
-    if(user){
-      document.user = user;
-
-      let docs: DocumentEntity = await this.docRepo.save(document);
-      return {
-        title: docs.title,
-        owner: docs.user.userName,
-        createdAt: docs.createdAt,
-        updatedAt: docs.updatedAt
-      };
-    } else {
-      throw new UnauthorizedException();
-    }
     } catch (error: any) {
       throw new HttpException(error.mesage, 500);
     }
-    
+
   }
 
 }

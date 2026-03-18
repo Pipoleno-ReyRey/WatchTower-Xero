@@ -23,5 +23,5 @@ export class DocumentEntity {
     user!: UserEntity;
 
     @Column({name: "password", type: "varchar", nullable: true})
-    password!: string;
+    password?: string | null;
 }

@@ -14,7 +14,7 @@ import { PassportModule } from '@nestjs/passport';
   JwtModule.registerAsync({
     useFactory: () => ({
       secret: process.env.TOKEN_SECRET,
-      signOptions: { expiresIn: '1h' },
+      signOptions: { expiresIn: '2d' },
     }),
   })],
   controllers: [UserController],
