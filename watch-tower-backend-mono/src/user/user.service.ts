@@ -1,9 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { documentDto } from 'core/dtos/document.dto';
 import { LoginDto } from 'core/dtos/login.dto';
 import { roleDto } from 'core/dtos/role.dto';
-import { SessionDto } from 'core/dtos/session.dto';
 import { signIn } from 'core/dtos/sign.dto';
 import { UserDto } from 'core/dtos/user.dto';
 import { RoleUserEntity } from 'core/entities/role-user.entity';
@@ -14,7 +12,6 @@ import bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { AuditLogEntity } from 'core/entities/audit-logs.entity';
-import { use } from 'passport';
 
 @Injectable()
 export class UserService {
@@ -162,6 +159,7 @@ export class UserService {
           status: user.status,
           role: user.roles.map(roles => {
             return {
+              id: roles.role.id,
               role: roles.role.role
             }
           }),
