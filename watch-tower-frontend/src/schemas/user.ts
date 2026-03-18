@@ -1,14 +1,13 @@
 import { z } from "zod";
 import { roleSchema } from "./role";
 
-
 export const userCreateSchema = z.object({
   name: z
     .string()
     .min(3, "El nombre debe tener al menos 3 caracteres")
     .max(80, "El nombre es demasiado largo"),
 
-  username: z
+  userName: z
     .string()
     .min(3, "El usuario debe tener al menos 3 caracteres")
     .max(30, "El usuario no puede exceder 30 caracteres"),
@@ -17,7 +16,8 @@ export const userCreateSchema = z.object({
 
   role: roleSchema,
 
-  status: z.string().min(1, "Debe seleccionar un estado"),
+  status: z.boolean(),
+  // status: z.boolean().default(true),
 
   pin: z
     .string()
@@ -25,9 +25,12 @@ export const userCreateSchema = z.object({
     .max(6, "El PIN no puede tener más de 6 dígitos")
     .regex(/^\d+$/, "El PIN solo puede contener números"),
 });
-export const userSchema = userCreateSchema.extend({
-  id: z.number(),
-});
+
+export const userSchema = userCreateSchema
+  .omit({ pin: true })
+  .extend({
+    id: z.number(),
+  });
 
 export type UserForm = z.infer<typeof userCreateSchema>;
 export type IUser = z.infer<typeof userSchema>;

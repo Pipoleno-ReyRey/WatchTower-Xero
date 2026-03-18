@@ -5,7 +5,11 @@ import AppSidebar from "../components/common/AppSidebar";
 import { MobileHeader } from "../components/common/MobileHeader";
 import { ToastContainer } from "react-toastify";
 
+import { Loader } from "../components/common/Loader";
+import { useIsFetching } from "@tanstack/react-query";
+
 export const MainLayout = () => {
+  const fetching = useIsFetching();
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -13,8 +17,9 @@ export const MainLayout = () => {
       <SidebarInset>
         <MobileHeader />
 
-        <main className="flex flex-1 flex-col p-4">
+        <main className="flex flex-1 flex-col p-4 overflow-hidden">
           <Outlet />
+          {fetching > 0 && <Loader />}
         </main>
       </SidebarInset>
       <ToastContainer />

@@ -7,8 +7,8 @@ export const axiosClient = axios.create({
 axiosClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
 
-  if (token) {
-    config.headers.token = token;
+  if (token && config.headers) {
+    config.headers.set("token", token);
   }
 
   return config;
@@ -18,10 +18,13 @@ axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem("token");
-      window.location.href = "/login";
+      console.log(error);
+
+      // opcional
+      // localStorage.removeItem("token");
+      // window.location.href = "/login";
     }
 
     return Promise.reject(error);
-  },
+  }
 );

@@ -21,24 +21,23 @@ import { UserTable } from "../components/user/UserTable";
 import { UserModal } from "../components/user/UserModal";
 import { CustomSelect } from "../components/form/CustomSelect";
 
-import { dataUsers } from "../data/data";
-
 import { Button } from "../components/ui/button";
 import { useStore } from "../store/appStore";
+import { useUser } from "../hooks/useUser";
+import { useSearch } from "../hooks/useSearch";
+import { roleOptions, statusOptions } from "../data/data";
 
 export const UserPage = () => {
   const openCreate = useStore((s) => s.openCreate);
 
-  const roleOptions = [
-    { label: "Administrador", value: "1" },
-    { label: "Usuario", value: "2" },
-  ];
+  const { userQuery } = useUser();
+  const { filteredData, search, setSearch, setFilter } = useSearch(
+    userQuery.data,
+  );
 
-  const statusOptions = [
-    { label: "Activo", value: "1" },
-    { label: "Inactivo", value: "2" },
-    { label: "Bloqueado", value: "3" },
-  ];
+  const totalUsers = filteredData.length;
+  const usersEnabled = filteredData.filter((u) => u.status === true).length;
+  const usersDisabled = filteredData.filter((u) => !u.status).length;
 
   return (
     <>
@@ -53,9 +52,17 @@ export const UserPage = () => {
         </div>
 
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4">
-          <Stat label="Total usuarios" icon={User2} data="10" />
-          <Stat label="Activo" icon={Shield} data="7" />
-          <Stat label="Bloqueado" icon={LockKeyhole} data="2" />
+          <Stat
+            label="Total usuarios"
+            icon={User2}
+            data={totalUsers.toString()}
+          />
+          <Stat label="Activo" icon={Shield} data={usersEnabled.toString()} />
+          <Stat
+            label="Bloqueado"
+            icon={LockKeyhole}
+            data={usersDisabled.toString()}
+          />
           <Stat label="Alto riesgo" icon={TriangleAlert} data="2" />
         </div>
 
@@ -63,7 +70,11 @@ export const UserPage = () => {
           <CardContent className="grid grid-cols-1 gap-2 lg:grid-cols-4">
             <div className="lg:col-span-3">
               <InputGroup>
-                <InputGroupInput placeholder="Buscar usuarios por nombre o email..." />
+                <InputGroupInput
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Buscar usuarios por nombre o email..."
+                />
                 <InputGroupAddon>
                   <SearchIcon />
                 </InputGroupAddon>
@@ -77,16 +88,21 @@ export const UserPage = () => {
                 placeholder="Roles"
                 options={roleOptions}
                 className="lg:w-44"
+                onValueChange={(value) => setFilter("role", value)}
               />
 
-              <CustomSelect placeholder="Estado" options={statusOptions} />
+              <CustomSelect
+                placeholder="Estado"
+                onValueChange={(value) => setFilter("status", value)}
+                options={statusOptions}
+              />
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent>
-            <UserTable users={dataUsers} />
+            <UserTable users={filteredData} />
           </CardContent>
         </Card>
       </div>
