@@ -63,7 +63,7 @@ export class UserService {
       let rolesUsers = roles.map(role => {
         let data = new RoleUserEntity();
         data.user = user.userName;
-        data.role = role;
+        data.role = role.id;
 
         return data;
       })
@@ -149,6 +149,11 @@ export class UserService {
         .innerJoinAndSelect("uu.audit", "audit")
         .getMany();
 
+      let roles: RoleEntity[] | null = await this.roleRepository
+      .createQueryBuilder()
+      .select()
+      .getMany();
+
       if (users.length < 0) {
         return;
       }
@@ -160,9 +165,11 @@ export class UserService {
           userName: user.userName,
           email: user.email,
           status: user.status,
-          role: user.roles.map(roles => {
+          role: user.roles.map(r => {
+            let rol = roles.filter(rol => rol.id == r.role)[0]
             return {
-              role: roles.role.role
+              id: rol.id,
+              role: rol.role
             }
           }),
           risk: `${risk}%`

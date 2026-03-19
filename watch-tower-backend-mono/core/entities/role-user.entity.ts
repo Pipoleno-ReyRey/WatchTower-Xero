@@ -10,7 +10,7 @@ export class RoleUserEntity {
     user!: string;
 
     @PrimaryColumn()
-    @ManyToOne(() => RoleEntity, role => role.role)
+    @ManyToOne(() => RoleEntity, role => role.id)
     @JoinColumn({name: "role", referencedColumnName: "id"})
-    role!: RoleEntity;
+    role!: number;
 }
