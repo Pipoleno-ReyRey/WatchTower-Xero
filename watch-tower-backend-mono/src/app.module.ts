@@ -19,7 +19,11 @@ import { AuditModule } from './audit/audit.module';
       username: process.env.DB_USER || "postgres",
       password: process.env.DB_PASSWORD || "password",
       database: process.env.DB_NAME || "watchtower",
+      schema: "xerotrust",
       entities: [...entitiesDb],
+      ssl: {
+        rejectUnauthorized: false
+      }
     }),
     TypeOrmModule.forFeature([...entitiesDb]),
     UserModule,
