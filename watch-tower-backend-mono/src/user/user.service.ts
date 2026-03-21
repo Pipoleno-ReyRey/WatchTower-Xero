@@ -12,6 +12,7 @@ import bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { AuditLogEntity } from 'core/entities/audit-logs.entity';
+import { use } from 'passport';
 
 @Injectable()
 export class UserService {
@@ -79,7 +80,7 @@ export class UserService {
     }
   }
 
-  async getUser(user: LoginDto): Promise<UserDto | any> {
+  async getUser(user: LoginDto, ip: string): Promise<UserDto | any> {
 
     try {
 
@@ -102,6 +103,12 @@ export class UserService {
 
         if (comparePassword && pin) {
           // await this.createSession(user, login, "LOGIN")
+          let audit: AuditLogEntity = new AuditLogEntity();
+          audit.action = "LOGIN_SUCCEEDED";
+          audit.ip = ip;
+          audit.user = login;
+
+          await this.auditRepo.save(audit);
           let response = {
             userName: login.userName,
             email: login.email,
@@ -112,9 +119,20 @@ export class UserService {
             token: this.jwt.sign(response)
           }
         } else {
+          let audit: AuditLogEntity = new AuditLogEntity();
+          audit.action = "LOGIN_FAILED";
+          audit.ip = ip;
+          audit.user = login;
+
+          await this.auditRepo.save(audit);
           return null;
         }
       } else {
+        let audit: AuditLogEntity = new AuditLogEntity();
+          audit.action = "LOGIN_FAILED";
+          audit.ip = ip;
+
+          await this.auditRepo.save(audit);
         return null;
       }
     } catch (error: any) {

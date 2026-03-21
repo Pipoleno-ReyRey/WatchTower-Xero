@@ -11,8 +11,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post("/login")
-  async loginUser(@Body() login: LoginDto) {
-    let response = await this.userService.getUser(login);
+  async loginUser(@Body() login: LoginDto, @Req() req) {
+    let response = await this.userService.getUser(login, req.ip);
     if(!response){
       throw new UnauthorizedException;
     } else {
