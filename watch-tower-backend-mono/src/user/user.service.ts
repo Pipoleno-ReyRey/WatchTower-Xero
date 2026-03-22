@@ -1,29 +1,34 @@
-import { HttpException, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { LoginDto } from 'core/dtos/login.dto';
-import { roleDto } from 'core/dtos/role.dto';
-import { signIn } from 'core/dtos/sign.dto';
-import { UserDto } from 'core/dtos/user.dto';
-import { RoleUserEntity } from 'core/entities/role-user.entity';
-import { RoleEntity } from 'core/entities/role.entity';
-import { SessionEntity } from 'core/entities/sessions.entity';
-import { UserEntity } from 'core/entities/user.entity';
-import bcrypt from 'bcryptjs';
-import { Repository } from 'typeorm';
-import { JwtService } from '@nestjs/jwt';
-import { AuditLogEntity } from 'core/entities/audit-logs.entity';
-import { use } from 'passport';
+import { HttpException, Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { LoginDto } from "core/dtos/login.dto";
+import { roleDto } from "core/dtos/role.dto";
+import { signIn } from "core/dtos/sign.dto";
+import { UserDto } from "core/dtos/user.dto";
+import { RoleUserEntity } from "core/entities/role-user.entity";
+import { RoleEntity } from "core/entities/role.entity";
+import { SessionEntity } from "core/entities/sessions.entity";
+import { UserEntity } from "core/entities/user.entity";
+import bcrypt from "bcryptjs";
+import { Repository } from "typeorm";
+import { JwtService } from "@nestjs/jwt";
+import { AuditLogEntity } from "core/entities/audit-logs.entity";
+import { use } from "passport";
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
-    @InjectRepository(RoleUserEntity) private roleUserRepository: Repository<RoleUserEntity>,
-    @InjectRepository(RoleEntity) private roleRepository: Repository<RoleEntity>,
-    @InjectRepository(SessionEntity) private sessionRepository: Repository<SessionEntity>,
-    @InjectRepository(AuditLogEntity) private auditRepo: Repository<AuditLogEntity>,
-    private readonly jwt: JwtService
-  ) { }
+    @InjectRepository(UserEntity)
+    private userRepository: Repository<UserEntity>,
+    @InjectRepository(RoleUserEntity)
+    private roleUserRepository: Repository<RoleUserEntity>,
+    @InjectRepository(RoleEntity)
+    private roleRepository: Repository<RoleEntity>,
+    @InjectRepository(SessionEntity)
+    private sessionRepository: Repository<SessionEntity>,
+    @InjectRepository(AuditLogEntity)
+    private auditRepo: Repository<AuditLogEntity>,
+    private readonly jwt: JwtService,
+  ) {}
 
   async createUser(sign: signIn): Promise<LoginDto | null> {
     try {
@@ -49,22 +54,23 @@ export class UserService {
         return null;
       }
 
-      let rolesId = sign.roles.map(role => {
-        return role.id
-      })
+      let rolesId = sign.roles.map((role) => {
+        return role.id;
+      });
 
-      let roles = await this.roleRepository.createQueryBuilder()
+      let roles = await this.roleRepository
+        .createQueryBuilder()
         .select()
         .where("id IN(:...id)", { id: rolesId })
         .getMany();
 
-      let rolesUsers = roles.map(role => {
+      let rolesUsers = roles.map((role) => {
         let data = new RoleUserEntity();
         data.user = user.userName;
         data.role = role.id;
 
         return data;
-      })
+      });
 
       let newUser: UserEntity = await this.userRepository.save(user);
       await this.roleUserRepository.save(rolesUsers);
@@ -73,18 +79,17 @@ export class UserService {
         email: newUser.email,
         user: newUser.userName,
         password: newUser.password,
-        pin: newUser.pin
+        pin: newUser.pin,
       };
     } catch (error: any) {
-      throw new HttpException(error.message, 500)
+      throw new HttpException(error.message, 500);
     }
   }
 
   async getUser(user: LoginDto, ip: string): Promise<UserDto | any> {
-
     try {
-
-      let login: UserEntity | null = await this.userRepository.createQueryBuilder("uu")
+      let login: UserEntity | null = await this.userRepository
+        .createQueryBuilder("uu")
         .innerJoinAndSelect("uu.roles", "roles")
         .where("uu.user_name = :userName", { userName: user.user })
         .orWhere("uu.email = :email", { email: user.email })
@@ -93,12 +98,20 @@ export class UserService {
       let crypt = await bcrypt.hash(user.password, 10);
 
       if (login) {
-        let roles: roleDto[] = (await this.roleRepository.createQueryBuilder()
+        let roles: roleDto[] = (await this.roleRepository
+          .createQueryBuilder()
           .select(["id as id", "role as role"])
-          .where("id IN(:...roles)", { roles: login?.roles.map(role => { return role.role }) })
+          .where("id IN(:...roles)", {
+            roles: login?.roles.map((role) => {
+              return role.role;
+            }),
+          })
           .getRawMany()) as roleDto[];
 
-        let comparePassword = await bcrypt.compare(user.password, login.password);
+        let comparePassword = await bcrypt.compare(
+          user.password,
+          login.password,
+        );
         let pin = login.pin === user.pin ? true : false;
 
         if (comparePassword && pin) {
@@ -112,12 +125,12 @@ export class UserService {
           let response = {
             userName: login.userName,
             email: login.email,
-            role: roles
+            role: roles,
           };
           return {
             ...response,
-            token: this.jwt.sign(response)
-          }
+            token: this.jwt.sign(response),
+          };
         } else {
           let audit: AuditLogEntity = new AuditLogEntity();
           audit.action = "LOGIN_FAILED";
@@ -129,19 +142,22 @@ export class UserService {
         }
       } else {
         let audit: AuditLogEntity = new AuditLogEntity();
-          audit.action = "LOGIN_FAILED";
-          audit.ip = ip;
+        audit.action = "LOGIN_FAILED";
+        audit.ip = ip;
 
-          await this.auditRepo.save(audit);
+        await this.auditRepo.save(audit);
         return null;
       }
     } catch (error: any) {
       throw new HttpException(error.message, 500);
     }
-
   }
 
-  private async createSession(logs: LoginDto, user: UserEntity, action: string) {
+  private async createSession(
+    logs: LoginDto,
+    user: UserEntity,
+    action: string,
+  ) {
     try {
       let session: SessionEntity = {
         ipAddress: logs.session!.ip,
@@ -165,30 +181,34 @@ export class UserService {
         .getMany();
 
       let roles: RoleEntity[] | null = await this.roleRepository
-      .createQueryBuilder()
-      .select()
-      .getMany();
+        .createQueryBuilder()
+        .select()
+        .getMany();
 
       if (users.length < 0) {
         return;
       }
 
-      let response: UserDto[] = users.map(user => {
-        let risk = user.audit.filter(audit => audit.action == "LOGIN_FAILED").length * 5;
-        
+      let response: UserDto[] = users.map((user) => {
+        let risk =
+          user.audit.filter((audit) => audit.action == "LOGIN_FAILED").length *
+          5;
+
         return {
+          id: user.id,
+          name: user.name,
           userName: user.userName,
           email: user.email,
           status: user.status,
-          role: user.roles.map(r => {
-            let rol = roles.filter(rol => rol.id == r.role)[0]
+          role: user.roles.map((r) => {
+            let rol = roles.filter((rol) => rol.id == r.role)[0];
             return {
               id: rol.id,
-              role: rol.role
-            }
+              role: rol.role,
+            };
           }),
-          risk: `${risk}%`
-        }
+          risk: `${risk}%`,
+        };
       });
 
       return response;
@@ -196,7 +216,6 @@ export class UserService {
       throw new HttpException(error.message, 500);
     }
   }
-
 
   async getAllRoles() {
     let data: RoleEntity[] = await this.roleRepository
@@ -213,60 +232,54 @@ export class UserService {
       role.role = create.role!;
       role.description = create.description!;
       return await this.roleRepository.save(role);
-
     } catch (error: any) {
       throw new HttpException(error.message, 500);
     }
-
-
   }
 
-  async updateUser(user: string, password?: string, pin?: string){
-    if(password && !pin){
+  async updateUser(user: string, password?: string, pin?: string) {
+    if (password && !pin) {
       let passCrypt: string = await bcrypt.hash(password, 10);
       try {
         await this.userRepository
-        .createQueryBuilder()
-        .update(UserEntity)
-        .set({
-          password: passCrypt
-        })
-        .where("user_name = :user", {user: user})
-        .execute();
+          .createQueryBuilder()
+          .update(UserEntity)
+          .set({
+            password: passCrypt,
+          })
+          .where("user_name = :user", { user: user })
+          .execute();
       } catch (error: any) {
-        throw new HttpException(error.message, 500)
+        throw new HttpException(error.message, 500);
       }
-    } else if(pin && !password){
+    } else if (pin && !password) {
       try {
         await this.userRepository
-        .createQueryBuilder()
-        .update(UserEntity)
-        .set({
-          pin: pin
-        })
-        .where("user_name = :user", {user: user})
-        .execute();
+          .createQueryBuilder()
+          .update(UserEntity)
+          .set({
+            pin: pin,
+          })
+          .where("user_name = :user", { user: user })
+          .execute();
       } catch (error: any) {
-        throw new HttpException(error.message, 500)
+        throw new HttpException(error.message, 500);
       }
-
-    } else if(pin && password){
+    } else if (pin && password) {
       let passCrypt: string = await bcrypt.hash(password, 10);
       try {
         await this.userRepository
-        .createQueryBuilder()
-        .update(UserEntity)
-        .set({
-          password: passCrypt,
-          pin: pin
-        })
-        .where("user_name = :user", {user: user})
-        .execute();
+          .createQueryBuilder()
+          .update(UserEntity)
+          .set({
+            password: passCrypt,
+            pin: pin,
+          })
+          .where("user_name = :user", { user: user })
+          .execute();
       } catch (error: any) {
-        throw new HttpException(error.message, 500)
+        throw new HttpException(error.message, 500);
       }
     }
   }
-
-
 }

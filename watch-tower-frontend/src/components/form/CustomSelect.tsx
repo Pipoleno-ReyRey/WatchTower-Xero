@@ -16,6 +16,7 @@ type Option = {
 type CustomSelectProps = {
   label?: string;
   options: Option[];
+  value?: string; // 👈 NUEVO (controlado)
   defaultValue?: string;
   placeholder?: string;
   onValueChange?: (value: string) => void;
@@ -25,13 +26,18 @@ type CustomSelectProps = {
 export function CustomSelect({
   label,
   options,
+  value,
   defaultValue,
   placeholder = "Select an option",
   onValueChange,
   className = "w-full",
 }: CustomSelectProps) {
   return (
-    <Select defaultValue={defaultValue} onValueChange={onValueChange}>
+    <Select
+      value={value} // 👈 controlado
+      defaultValue={defaultValue} // 👈 opcional
+      onValueChange={onValueChange}
+    >
       <SelectTrigger className={className}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>

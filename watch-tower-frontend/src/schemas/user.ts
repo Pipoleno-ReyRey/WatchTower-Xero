@@ -37,5 +37,5 @@ export const userSchema = userCreateSchema
     id: z.number(),
   });
 
-export type UserForm = z.infer<typeof userCreateSchema>;
+export type IUserForm = z.infer<typeof userCreateSchema>;
 export type IUser = z.infer<typeof userSchema>;

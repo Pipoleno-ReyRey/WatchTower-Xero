@@ -8,36 +8,37 @@ import {
   Plus,
 } from "lucide-react";
 
-import { Stat } from "../components/dashboard/Stat";
-import { Card, CardContent } from "../components/ui/card";
+import { Stat } from "../../components/dashboard/Stat";
+import { Card, CardContent } from "../../components/ui/card";
 
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-} from "../components/ui/input-group";
+} from "../../components/ui/input-group";
 
-import { UserTable } from "../components/user/UserTable";
-import { UserModal } from "../components/user/UserModal";
-import { CustomSelect } from "../components/form/CustomSelect";
+import { UserTable } from "../../components/user/UserTable";
 
-import { Button } from "../components/ui/button";
-import { useStore } from "../store/appStore";
-import { useUser } from "../hooks/useUser";
-import { useSearch } from "../hooks/useSearch";
-import { roleOptions, statusOptions } from "../data/data";
+import { CustomSelect } from "../../components/form/CustomSelect";
+
+import { Button } from "../../components/ui/button";
+
+import { useUser } from "../../hooks/useUser";
+import { useSearch } from "../../hooks/useSearch";
+import { statusOptions } from "../../data/data";
+import { Link } from "react-router-dom";
+import { useRoles } from "../../hooks/useRoles";
 
 export const UserPage = () => {
-  const openCreate = useStore((s) => s.openCreate);
-
   const { userQuery } = useUser();
+  const { data: roles } = useRoles();
   const { filteredData, search, setSearch, setFilter } = useSearch(
     userQuery.data,
   );
 
-  const totalUsers = filteredData.length;
-  const usersEnabled = filteredData.filter((u) => u.status === true).length;
-  const usersDisabled = filteredData.filter((u) => !u.status).length;
+  // const totalUsers = filteredData.length;
+  // const usersEnabled = filteredData.filter((u) => u.status === true).length;
+  // const usersDisabled = filteredData.filter((u) => !u.status).length;
 
   return (
     <>
@@ -45,24 +46,18 @@ export const UserPage = () => {
         <div className="py-4 flex justify-between items-center">
           <h2 className="font-bold text-2xl">Gestión de usuarios</h2>
 
-          <Button onClick={openCreate}>
-            <Plus />
-            Nuevo usuario
-          </Button>
+          <Link to={"./create"}>
+            <Button>
+              <Plus />
+              Nuevo usuario
+            </Button>
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4">
-          <Stat
-            label="Total usuarios"
-            icon={User2}
-            data={totalUsers.toString()}
-          />
-          <Stat label="Activo" icon={Shield} data={usersEnabled.toString()} />
-          <Stat
-            label="Bloqueado"
-            icon={LockKeyhole}
-            data={usersDisabled.toString()}
-          />
+          <Stat label="Total usuarios" icon={User2} data={"8"} />
+          <Stat label="Activo" icon={Shield} data={"8"} />
+          <Stat label="Bloqueado" icon={LockKeyhole} data={"0"} />
           <Stat label="Alto riesgo" icon={TriangleAlert} data="2" />
         </div>
 
@@ -84,10 +79,18 @@ export const UserPage = () => {
             <div className="flex gap-2 items-center lg:col-span-1">
               <Filter size={30} className="hidden lg:block" />
 
+              {/* <CustomSelect
+                placeholder="Roles"
+                options={roles ?? []}
+                className="lg:w-44"
+                onValueChange={(value) => setFilter("role", value)}
+              /> */}
               <CustomSelect
                 placeholder="Roles"
-                options={roleOptions}
-                className="lg:w-44"
+                options={(roles ?? []).map((r) => ({
+                  label: r.role,
+                  value: r.id.toString(),
+                }))}
                 onValueChange={(value) => setFilter("role", value)}
               />
 
@@ -102,12 +105,10 @@ export const UserPage = () => {
 
         <Card>
           <CardContent>
-            <UserTable users={filteredData} />
+            <UserTable users={filteredData || []} />
           </CardContent>
         </Card>
       </div>
-
-      <UserModal />
     </>
   );
 };

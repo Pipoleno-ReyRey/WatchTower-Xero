@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { UserPage } from "../pages/UserPage";
+import { UserPage } from "../pages/User/UserPage";
 import { LoginPage } from "../pages/LoginPage";
 import { RegisterPage } from "../pages/RegisterPage";
 import { DashboardPage } from "../pages/DashboardPage";
@@ -10,6 +10,7 @@ import { DocumentPage } from "../pages/Document/DocumentPage";
 import { CreateDocumentPage } from "../pages/Document/CreateDocumentPage";
 import { DocumentDetailPage } from "../pages/Document/DocumentDetailsPage";
 import { RolePage } from "../pages/RolePage";
+import { UserForm } from "../components/user/UserForm";
 
 export const routes = createBrowserRouter([
   {
@@ -29,7 +30,15 @@ export const routes = createBrowserRouter([
         children: [
           {
             path: "user",
-            element: <UserPage />,
+
+            children: [
+              {
+                index: true,
+                element: <UserPage />,
+              },
+              { path: "create", element: <UserForm /> },
+              { path: ":id", element: <UserForm /> },
+            ],
           },
           {
             path: "roles",

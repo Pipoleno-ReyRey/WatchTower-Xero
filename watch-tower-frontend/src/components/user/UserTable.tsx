@@ -11,6 +11,7 @@ import {
 } from "../ui/table";
 import { Button } from "../ui/button";
 import { useStore } from "../../store/appStore";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   users: IUser[];
@@ -18,6 +19,7 @@ interface Props {
 
 export const UserTable = ({ users }: Props) => {
   const openEdit = useStore((s) => s.openEdit);
+  const navigate = useNavigate();
 
   return (
     <div className="w-full">
@@ -28,29 +30,31 @@ export const UserTable = ({ users }: Props) => {
               <TableHead>Nombre</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Rol</TableHead>
-              <TableHead>Estado</TableHead>
+              {/* <TableHead>Estado</TableHead> */}
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
 
-          <TableBody >
+          <TableBody>
             {users.map((item) => (
               <TableRow key={item.userName}>
                 <TableCell className="font-medium">{item.userName}</TableCell>
 
                 <TableCell>{item.email}</TableCell>
 
-                <TableCell>{item.role.role}</TableCell>
+                <TableCell>{item.roles?.[0]?.role ?? "Sin rol"}</TableCell>
 
-                <TableCell>
+                {/* <TableCell>
                   {item.status === true ? "Activo" : "Bloqueado"}
-                </TableCell>
+                </TableCell> */}
 
                 <TableCell>
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => openEdit(item)}
+                    onClick={() => {
+                      navigate(`${item.id}`);
+                    }}
                   >
                     <UserRoundCog size={18} />
                   </Button>
