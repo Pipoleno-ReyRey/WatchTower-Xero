@@ -30,7 +30,7 @@ export class UserService {
     private readonly jwt: JwtService,
   ) {}
 
-  async createUser(sign: signIn): Promise<LoginDto | null> {
+  async createUser(sign: signIn, ip: string): Promise<LoginDto | null> {
     try {
       const user = new UserEntity();
       const password = await bcrypt.hash(sign.password, 10);
@@ -74,7 +74,12 @@ export class UserService {
 
       let newUser: UserEntity = await this.userRepository.save(user);
       await this.roleUserRepository.save(rolesUsers);
-      // await this.createSession(sign, newUser, "REGISTER");
+      let audit: AuditLogEntity = new AuditLogEntity();
+          audit.action = "CREATED_USER";
+          audit.ip = ip;
+          audit.user = newUser;
+
+          await this.auditRepo.save(audit);
       return {
         email: newUser.email,
         user: newUser.userName,

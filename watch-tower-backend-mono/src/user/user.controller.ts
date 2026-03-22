@@ -26,8 +26,8 @@ export class UserController {
   }
 
   @Post("/sign-in")
-  async signUp(@Body() sign: signIn) {
-    let response = await this.userService.createUser(sign)
+  async signUp(@Body() sign: signIn, @Req() req) {
+    let response = await this.userService.createUser(sign, req.ip)
     if(!response){
       throw new HttpException("user exist", 409)
     } else {
