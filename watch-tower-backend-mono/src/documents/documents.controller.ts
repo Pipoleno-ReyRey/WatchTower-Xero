@@ -19,9 +19,9 @@ export class DocumentsController {
     return await this.documentsService.getSpecificDoc(id, pass.pass, req.info.userName);
   }
 
-  @Post("/create")
+  @Post("/new/create")
   async createDoc(@Body() doc: createDocDTO, @Req() req){
     doc.owner = req.info.userName;
-    return await this.documentsService.createDocument(doc)
+    return await this.documentsService.createDocument(doc);
   }
 }
