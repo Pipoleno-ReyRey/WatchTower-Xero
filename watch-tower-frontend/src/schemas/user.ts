@@ -14,9 +14,14 @@ export const userCreateSchema = z.object({
 
   email: z.string().email("Debe ser un email válido"),
 
-  role: roleSchema,
+  roles: z.array(roleSchema).min(1),
 
-  status: z.boolean(),
+  // status: z.boolean(),
+
+
+  password: z
+    .string("contrase;a requerida")
+    .min(6, "El PIN debe tener mínimo 6 dígitos"),
   // status: z.boolean().default(true),
 
   pin: z
@@ -27,7 +32,7 @@ export const userCreateSchema = z.object({
 });
 
 export const userSchema = userCreateSchema
-  .omit({ pin: true })
+  .omit({ pin: true, password: true })
   .extend({
     id: z.number(),
   });

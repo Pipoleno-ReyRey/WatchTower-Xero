@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -20,36 +20,20 @@ import { Input } from "../ui/input";
 import { CustomSelect } from "../form/CustomSelect";
 
 import { useStore } from "../../store/appStore";
+import { Eye, Lock } from "lucide-react";
+import { useRoles } from "../../hooks/useRoles";
 
-const statusOptions = [
-  { label: "Activo", value: "1" },
-  { label: "Inactivo", value: "2" },
-  { label: "Bloqueado", value: "3" },
-];
-
-const roleOptions = [
-  {
-    label: "Administrador",
-    value: "1",
-    role: {
-      id: 1,
-      role: "Administrador",
-      description: "Acceso total",
-    },
-  },
-  {
-    label: "Usuario",
-    value: "2",
-    role: {
-      id: 2,
-      role: "Usuario",
-      description: "Acceso básico",
-    },
-  },
-];
+// const statusOptions = [
+//   { label: "Activo", value: "1" },
+//   { label: "Inactivo", value: "2" },
+//   { label: "Bloqueado", value: "3" },
+// ];
 
 export const UserModal = () => {
   const { isOpenModal, closeModal, selectedUser } = useStore();
+  const [showPassword, setShowPassword] = useState(false);
+
+  const { data } = useRoles();
 
   const form = useForm<UserForm>({
     resolver: zodResolver(userCreateSchema),
@@ -58,9 +42,10 @@ export const UserModal = () => {
       name: "",
       userName: "",
       email: "",
-      role: undefined,
-      status: true,
+      roles: undefined,
+      // status: true,
       pin: "",
+      password: "",
     },
   });
 
@@ -81,6 +66,7 @@ export const UserModal = () => {
     }
 
     closeModal();
+    console.log(data);
   }
 
   return (
@@ -157,11 +143,48 @@ export const UserModal = () => {
                 </Field>
               )}
             />
+            {/* password */}
+            <Controller
+              name="password"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>
+                    Contraseña<span className="text-red-500">*</span>
+                  </FieldLabel>
+
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+
+                    <Input
+                      {...field}
+                      id="login-password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="******"
+                      className="pl-10 pr-10"
+                      aria-invalid={fieldState.invalid}
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </button>
+                  </div>
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
 
             {/* rol */}
 
             <Controller
-              name="role"
+              name="roles"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
@@ -171,18 +194,18 @@ export const UserModal = () => {
 
                   <CustomSelect
                     placeholder="Seleccionar rol"
-                    options={roleOptions.map((r) => ({
-                      label: r.label,
-                      value: r.value,
+                    options={(data ?? []).map((r) => ({
+                      label: r.role,
+                      value: r.id.toString(),
                     }))}
-                    defaultValue={field.value?.id?.toString()}
+                    defaultValue={field.value?.[0]?.id?.toString()}
                     onValueChange={(value) => {
-                      const selectedRole = roleOptions.find(
-                        (r) => r.value === value,
+                      const selectedRole = data?.find(
+                        (r) => r.id.toString() === value,
                       );
 
                       if (selectedRole) {
-                        field.onChange(selectedRole.role);
+                        field.onChange([selectedRole]); 
                       }
                     }}
                   />
@@ -196,7 +219,7 @@ export const UserModal = () => {
 
             {/* estado */}
 
-            <Controller
+            {/* <Controller
               name="status"
               control={form.control}
               render={({ field, fieldState }) => (
@@ -217,7 +240,7 @@ export const UserModal = () => {
                   )}
                 </Field>
               )}
-            />
+            /> */}
 
             {/* pin */}
 

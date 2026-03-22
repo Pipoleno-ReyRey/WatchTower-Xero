@@ -12,7 +12,12 @@ export const createRoleSchema = roleSchema.omit({
 
 export const updateRoleSchema = roleSchema.partial();
 
+export const userRoleSchema = roleSchema.omit({
+  description: true,
+});
 
 export type Role = z.infer<typeof roleSchema>;
+
+export type UserRole =  z.infer<typeof userRoleSchema>;
 export type CreateRole = z.infer<typeof createRoleSchema>;
 export type UpdateRole = z.infer<typeof updateRoleSchema>;

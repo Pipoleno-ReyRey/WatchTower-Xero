@@ -4,7 +4,7 @@ import {
   Unlock,
   FileText,
   Calendar,
-  HardDrive,
+  // HardDrive,
   User,
 } from "lucide-react";
 
@@ -85,7 +85,7 @@ export const DocumentDetailPage = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
         <Card className="py-2">
           <CardContent className="flex items-center gap-3 p-4">
             <User className="text-muted-foreground" />
@@ -115,7 +115,7 @@ export const DocumentDetailPage = () => {
             </div>
           </CardContent>
         </Card>
-
+{/* 
         <Card className="py-2">
           <CardContent className="flex items-center gap-3 p-4">
             <HardDrive className="text-muted-foreground" />
@@ -124,7 +124,7 @@ export const DocumentDetailPage = () => {
               <p className="font-medium">{doc.size}</p>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
 
       <Card>
