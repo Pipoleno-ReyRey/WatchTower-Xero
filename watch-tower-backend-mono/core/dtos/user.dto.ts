@@ -4,11 +4,21 @@ import { roleDto } from "./role.dto";
 import { documentDto } from "./document.dto";
 
 export class UserDto{
-    name: string
+    name?: string
     userName?: string;
     email?: string;
     role?: roleDto[];
     documents?: documentDto[];
     token?: string;
     status!: boolean;
+}
+
+export class UpdateUser{
+    id!: number;
+    name!: string;
+    userName!: string;
+    email!: string;
+    password!: string;
+    rol!: roleDto;
+    pin!: string;
 }

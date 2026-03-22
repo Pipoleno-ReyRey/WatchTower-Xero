@@ -1,10 +1,11 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Patch, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Patch, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { LoginDto } from 'core/dtos/login.dto';
 import { signIn } from 'core/dtos/sign.dto';
 import { AuthGuard } from 'core/guards/auth.guard';
 import { RoleEntity } from 'core/entities/role.entity';
 import { UserService } from './user.service';
 import { roleDto } from 'core/dtos/role.dto';
+import { UpdateUser } from 'core/dtos/user.dto';
 
 @Controller()
 export class UserController {
@@ -51,5 +52,21 @@ export class UserController {
   @UseGuards(AuthGuard)
   async postRole(@Body() role: roleDto){
     return await this.userService.createRole(role);
+  }
+
+  @Get("user/get/:id")
+  @UseGuards(AuthGuard)
+  async getUser(@Param("id") id: number){
+    return await this.userService.getUserId(id);
+  }
+
+  @Patch("user/update")
+  @UseGuards(AuthGuard)
+  async patchUser(@Body() user: UpdateUser, @Req() req){
+    if(req.info.role[0].role == "admin"){
+      return await this.userService.update(user);
+    } else {
+      throw new UnauthorizedException();
+    }
   }
 }
