@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { LoginDto } from "core/dtos/login.dto";
 import { roleDto } from "core/dtos/role.dto";
 import { signIn } from "core/dtos/sign.dto";
-import { UserDto } from "core/dtos/user.dto";
+import { UpdateUser, UserDto } from "core/dtos/user.dto";
 import { RoleUserEntity } from "core/entities/role-user.entity";
 import { RoleEntity } from "core/entities/role.entity";
 import { SessionEntity } from "core/entities/sessions.entity";
@@ -28,9 +28,9 @@ export class UserService {
     @InjectRepository(AuditLogEntity)
     private auditRepo: Repository<AuditLogEntity>,
     private readonly jwt: JwtService,
-  ) {}
+  ) { }
 
-  async createUser(sign: signIn): Promise<LoginDto | null> {
+  async createUser(sign: signIn, ip: string): Promise<LoginDto | null> {
     try {
       const user = new UserEntity();
       const password = await bcrypt.hash(sign.password, 10);
@@ -74,7 +74,12 @@ export class UserService {
 
       let newUser: UserEntity = await this.userRepository.save(user);
       await this.roleUserRepository.save(rolesUsers);
-      // await this.createSession(sign, newUser, "REGISTER");
+      let audit: AuditLogEntity = new AuditLogEntity();
+      audit.action = "CREATED_USER";
+      audit.ip = ip;
+      audit.user = newUser;
+
+      await this.auditRepo.save(audit);
       return {
         email: newUser.email,
         user: newUser.userName,
@@ -281,5 +286,77 @@ export class UserService {
         throw new HttpException(error.message, 500);
       }
     }
+  }
+
+  async getUserId(id: number) {
+    try {
+      let user: UserEntity | null = await this.userRepository
+        .createQueryBuilder("uu")
+        .innerJoinAndSelect("uu.roles", "roles")
+        .where("uu.id = :id", { id: id })
+        .getOne();
+
+      let role = await this.roleRepository
+        .createQueryBuilder()
+        .where("id IN(:...ids)", { ids: user?.roles.map(r => { return r.role }) })
+        .getMany();
+
+      if (user) {
+        return {
+          id: user.id,
+          name: user.name,
+          userName: user.userName,
+          email: user.email,
+          role: {
+            id: role[0].id,
+            role: role[0].role
+          },
+          pin: user.pin
+        }
+      } else {
+        throw new HttpException("user not found", 403);
+      }
+
+    } catch (error: any) {
+      throw new HttpException(error.message, 500);
+    }
+  }
+
+  async update(user: UpdateUser) {
+    try {
+      let dbUser = await this.userRepository.findOne({where:{id: user.id}});
+
+      let userRole: RoleUserEntity = new RoleUserEntity();
+      userRole.user = dbUser!.userName;
+      userRole.role = user.rol.id!;
+
+      // await this.roleUserRepository
+      //   .createQueryBuilder()
+      //   .delete()
+      //   .where("user = :user", { user: dbUser!.userName })
+      //   .execute();
+
+      let audits = await this.auditRepo
+        .createQueryBuilder()
+        .select()
+        .where("user = :user", { user: dbUser!.userName })
+        .getMany();
+
+      // await this.auditRepo.createQueryBuilder().delete().where("user = :user", {user: dbUser!.userName}).execute();
+
+      dbUser!.name = user.name;
+      dbUser!.userName = user.userName;
+      dbUser!.email = user.email;
+      dbUser!.password = await bcrypt.hash(user.password, 10);
+      dbUser!.pin = user.pin;
+      
+      await this.userRepository.save(dbUser!);
+      // await this.roleUserRepository.insert(userRole);
+      // await this.auditRepo.insert(audits);
+      
+    } catch (error: any) {
+      throw new HttpException(error.message, 500);
+    }
+
   }
 }
