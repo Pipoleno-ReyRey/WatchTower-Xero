@@ -30,7 +30,7 @@ export const UserTable = ({ users }: Props) => {
               <TableHead>Nombre</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Rol</TableHead>
-              {/* <TableHead>Estado</TableHead> */}
+              <TableHead>Estado</TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
@@ -44,9 +44,9 @@ export const UserTable = ({ users }: Props) => {
 
                 <TableCell>{item.roles?.[0]?.role ?? "Sin rol"}</TableCell>
 
-                {/* <TableCell>
+                <TableCell>
                   {item.status === true ? "Activo" : "Bloqueado"}
-                </TableCell> */}
+                </TableCell>
 
                 <TableCell>
                   <Button

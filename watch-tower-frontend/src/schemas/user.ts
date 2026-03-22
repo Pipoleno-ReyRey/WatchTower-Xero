@@ -18,7 +18,6 @@ export const userCreateSchema = z.object({
 
   // status: z.boolean(),
 
-
   password: z
     .string("contrase;a requerida")
     .min(6, "El PIN debe tener mínimo 6 dígitos"),
@@ -35,6 +34,7 @@ export const userSchema = userCreateSchema
   .omit({ pin: true, password: true })
   .extend({
     id: z.number(),
+    status: z.boolean(),
   });
 
 export type IUserForm = z.infer<typeof userCreateSchema>;
