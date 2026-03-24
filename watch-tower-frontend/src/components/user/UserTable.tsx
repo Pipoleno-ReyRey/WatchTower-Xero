@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "../ui/table";
 import { Button } from "../ui/button";
-import { useStore } from "../../store/appStore";
+// import { useStore } from "../../store/appStore";
 import { useNavigate } from "react-router-dom";
 
 interface Props {
@@ -18,7 +18,7 @@ interface Props {
 }
 
 export const UserTable = ({ users }: Props) => {
-  const openEdit = useStore((s) => s.openEdit);
+  // const openEdit = useStore((s) => s.openEdit);
   const navigate = useNavigate();
 
   return (

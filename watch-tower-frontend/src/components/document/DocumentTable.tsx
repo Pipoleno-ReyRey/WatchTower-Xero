@@ -22,12 +22,11 @@ export const DocumentTable = ({ documents }: Props) => {
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
-              <TableHead>Nombre</TableHead>
-              <TableHead>Tipo</TableHead>
+              <TableHead>Titulo</TableHead>
               <TableHead>Propietario</TableHead>
+              <TableHead>Creado</TableHead>
               <TableHead>Actualizado</TableHead>
 
-              {/* <TableHead className="text-right">Balance</TableHead> */}
               <TableHead className=""></TableHead>
             </TableRow>
           </TableHeader>
@@ -36,15 +35,20 @@ export const DocumentTable = ({ documents }: Props) => {
               <TableRow key={d.id}>
                 <TableCell>
                   <div className="flex items-center gap-3">
-                    <div className="font-medium">{d.name}</div>
+                    <div className="font-medium">{d.title}</div>
                   </div>
                 </TableCell>
-                <TableCell>{d.type}</TableCell>
                 <TableCell>{d.owner}</TableCell>
-                <TableCell>{d.updatedAt}</TableCell>
+                <TableCell>
+                  {new Date(d.createdAt).toLocaleDateString("es-DO")}
+                </TableCell>
+
+                <TableCell>
+                  {new Date(d.updatedAt).toLocaleDateString("es-DO")}
+                </TableCell>
 
                 <TableCell className="">
-                  <Link to={d.id}>
+                  <Link to={`${d.id}`}>
                     <Button size={"sm"}>Ver</Button>
                   </Link>
                 </TableCell>

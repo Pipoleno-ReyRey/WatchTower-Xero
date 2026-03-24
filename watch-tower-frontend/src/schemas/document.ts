@@ -2,39 +2,36 @@ import { z } from "zod";
 
 export const createDocumentSchema = z
   .object({
-    name: z.string().min(1, "El nombre es requerido"),
+    title: z.string().min(1, "El título es requerido"),
+    owner: z.string().optional(),
     content: z.string().min(1, "El contenido es requerido"),
-    hasKey: z.boolean(),
-    docKey: z.string().optional(),
+    hasPass: z.boolean(),
+    pass: z.string().optional(), // 👈 sin min
   })
   .refine(
-    (data) => {
-      if (data.hasKey && !data.docKey) return false;
-      return true;
-    },
+    (data) => !data.hasPass || (data.pass && data.pass.length > 0),
     {
       message: "La clave es requerida",
-      path: ["docKey"],
-    },
+      path: ["pass"],
+    }
   );
 
-export const documentSchema = createDocumentSchema.extend({
-  id: z.string(),
-  type: z.string(),
-  owner: z.string(),
+export const documentSchema = z.object({
+  id: z.number(),
+  title: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
-  size: z.string(),
-//   shared: z.boolean(),
-//   sharedWith: z.array(z.string()),
+  owner: z.string(),
+  hasPass: z.boolean(),
+  content: z.string().nullable(),
 });
 
+// Para desbloquear documento
 export const unlockDocumentSchema = z.object({
   key: z.string().min(1, "La clave es requerida"),
 });
 
+// Types
 export type CreateDocumentForm = z.infer<typeof createDocumentSchema>;
-
 export type IDocument = z.infer<typeof documentSchema>;
-
 export type UnlockDocumentForm = z.infer<typeof unlockDocumentSchema>;
