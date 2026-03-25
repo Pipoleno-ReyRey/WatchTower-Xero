@@ -11,9 +11,11 @@ import { DocumentTable } from "../../components/document/DocumentTable";
 
 import { Button } from "../../components/ui/button";
 import { Link } from "react-router-dom";
-import { mockDocuments } from "../../data/data";
+
+import { useDocument } from "../../hooks/useDocument";
 
 export const DocumentPage = () => {
+  const { documentQuery } = useDocument();
   const roleOptions = [
     { label: "Administrador", value: "1" },
     { label: "Usuario", value: "2" },
@@ -65,7 +67,7 @@ export const DocumentPage = () => {
       </Card>
       <Card>
         <CardContent>
-          <DocumentTable documents={mockDocuments} />
+          <DocumentTable documents={documentQuery.data ?? []} />
         </CardContent>
       </Card>
     </div>

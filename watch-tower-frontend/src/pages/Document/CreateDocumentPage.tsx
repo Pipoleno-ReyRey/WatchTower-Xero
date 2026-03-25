@@ -17,26 +17,37 @@ import { Button } from "../../components/ui/button";
 import { Switch } from "../../components/ui/switch";
 import { Input } from "../../components/ui/input";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 
 export const CreateDocumentPage = () => {
   const form = useForm<CreateDocumentForm>({
     resolver: zodResolver(createDocumentSchema),
     mode: "onChange",
     defaultValues: {
-      name: "",
+      title: "",
       content: "",
-      hasKey: false,
-      docKey: "",
+      hasPass: false,
+      pass: "",
     },
   });
 
   const hasKey = useWatch({
     control: form.control,
-    name: "hasKey",
+    name: "hasPass",
   });
 
+  useEffect(() => {
+    if (!hasKey) {
+      form.setValue("pass", "");
+    }
+  }, [hasKey, form]);
+
   function onSubmit(data: CreateDocumentForm) {
-    console.log("Documento creado", data);
+    const payload = {
+      ...data,
+      pass: data.hasPass && data.pass ? data.pass : null,
+    };
+    console.log("Documento creado", payload);
   }
 
   return (
@@ -58,7 +69,7 @@ export const CreateDocumentPage = () => {
           {/* Nombre */}
 
           <Controller
-            name="name"
+            name="title"
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
@@ -99,7 +110,7 @@ export const CreateDocumentPage = () => {
           {/* Switch protección */}
 
           <Controller
-            name="hasKey"
+            name="hasPass"
             control={form.control}
             render={({ field }) => (
               <div className="flex items-center gap-3 rounded-lg border bg-secondary/50 p-3">
@@ -124,7 +135,7 @@ export const CreateDocumentPage = () => {
 
           {hasKey && (
             <Controller
-              name="docKey"
+              name="pass"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
@@ -132,6 +143,7 @@ export const CreateDocumentPage = () => {
 
                   <Input
                     {...field}
+                    value={field.value ?? ""}
                     type="password"
                     placeholder="Defina una clave"
                     className="font-mono"

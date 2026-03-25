@@ -4,7 +4,6 @@ import {
   Unlock,
   FileText,
   Calendar,
-  // HardDrive,
   User,
 } from "lucide-react";
 
@@ -18,28 +17,24 @@ import {
 } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { useDocument } from "../../hooks/useDocument";
+import { formatDate } from "../../utils/formatDate";
 
 export const DocumentDetailPage = () => {
+  const { id } = useParams();
+
   const [keyInput, setKeyInput] = useState("");
   const [unlocked, setUnlocked] = useState(false);
   const [keyError, setKeyError] = useState("");
 
-  // mock temporal
-  const doc = {
-    id: "1",
-    name: "Informe Financiero Q4",
-    type: "PDF",
-    owner: "Carlos Mendoza",
-    createdAt: "2026-01-15",
-    updatedAt: "2026-02-20",
-    size: "2.4 MB",
-    hasKey: true,
-    shared: true,
-    sharedWith: ["Ana Torres", "Maria Garcia"],
-    content:
-      "Este informe contiene los resultados financieros del cuarto trimestre del ejercicio fiscal 2025.",
-  };
+  const { documentQuery } = useDocument();
+
+  // 🔥 buscar el documento en la data
+  const doc = documentQuery.data?.find((d) => d.id === Number(id));
+
+  // if (documentQuery.isLoading) return <p>Cargando...</p>;
+  if (!doc) return <p>Documento no encontrado</p>;
 
   const handleUnlock = () => {
     if (keyInput === "1234") {
@@ -53,7 +48,7 @@ export const DocumentDetailPage = () => {
   return (
     <div className="w-full space-y-3">
       <div className="flex items-center justify-between py-4">
-        <div className="flex flex-col  gap-3">
+        <div className="flex flex-col gap-3">
           <Link to={".."}>
             <button className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
               <ArrowLeft className="h-4 w-4" />
@@ -62,25 +57,7 @@ export const DocumentDetailPage = () => {
           </Link>
 
           <div>
-            <h2 className="text-2xl font-bold">{doc.name}</h2>
-
-            {/* <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>{doc.type}</span>
-
-              {doc.hasKey && (
-                <span className="flex items-center gap-1">
-                  <Lock size={14} />
-                  Protegido
-                </span>
-              )}
-
-              {doc.shared && (
-                <span className="flex items-center gap-1">
-                  <Users2 size={14} />
-                  Compartido
-                </span>
-              )}
-            </div> */}
+            <h2 className="text-2xl font-bold">{doc.title}</h2>
           </div>
         </div>
       </div>
@@ -101,7 +78,7 @@ export const DocumentDetailPage = () => {
             <Calendar className="text-muted-foreground" />
             <div>
               <p className="text-xs text-muted-foreground">Creado</p>
-              <p className="font-medium">{doc.createdAt}</p>
+              <p className="font-medium">{formatDate(doc.createdAt, "long")}</p>
             </div>
           </CardContent>
         </Card>
@@ -111,20 +88,10 @@ export const DocumentDetailPage = () => {
             <Calendar className="text-muted-foreground" />
             <div>
               <p className="text-xs text-muted-foreground">Actualizado</p>
-              <p className="font-medium">{doc.updatedAt}</p>
+              <p className="font-medium">{formatDate(doc.updatedAt, "long")}</p>
             </div>
           </CardContent>
         </Card>
-{/* 
-        <Card className="py-2">
-          <CardContent className="flex items-center gap-3 p-4">
-            <HardDrive className="text-muted-foreground" />
-            <div>
-              <p className="text-xs text-muted-foreground">Tamaño</p>
-              <p className="font-medium">{doc.size}</p>
-            </div>
-          </CardContent>
-        </Card> */}
       </div>
 
       <Card>
@@ -138,8 +105,8 @@ export const DocumentDetailPage = () => {
         )}
 
         <CardContent>
-          {doc.hasKey && !unlocked ? (
-            <div className=" flex items-center flex-col gap-4 ">
+          {doc.hasPass && !unlocked ? (
+            <div className="flex items-center flex-col gap-4">
               <div className="flex flex-col items-center gap-3">
                 <Lock size={30} />
                 <p className="text-sm text-muted-foreground">
@@ -168,7 +135,9 @@ export const DocumentDetailPage = () => {
               </div>
             </div>
           ) : (
-            <p className="text-sm leading-relaxed">{doc.content}</p>
+            <p className="text-sm leading-relaxed">
+              {doc.content ?? "Sin contenido"}
+            </p>
           )}
         </CardContent>
       </Card>

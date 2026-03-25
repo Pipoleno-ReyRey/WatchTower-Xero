@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "../ui/table";
 import { Button } from "../ui/button";
-import { useStore } from "../../store/appStore";
+// import { useStore } from "../../store/appStore";
 import { useNavigate } from "react-router-dom";
 
 interface Props {
@@ -18,7 +18,7 @@ interface Props {
 }
 
 export const UserTable = ({ users }: Props) => {
-  const openEdit = useStore((s) => s.openEdit);
+  // const openEdit = useStore((s) => s.openEdit);
   const navigate = useNavigate();
 
   return (
@@ -30,7 +30,7 @@ export const UserTable = ({ users }: Props) => {
               <TableHead>Nombre</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Rol</TableHead>
-              {/* <TableHead>Estado</TableHead> */}
+              <TableHead>Estado</TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
@@ -44,9 +44,9 @@ export const UserTable = ({ users }: Props) => {
 
                 <TableCell>{item.roles?.[0]?.role ?? "Sin rol"}</TableCell>
 
-                {/* <TableCell>
+                <TableCell>
                   {item.status === true ? "Activo" : "Bloqueado"}
-                </TableCell> */}
+                </TableCell>
 
                 <TableCell>
                   <Button
