@@ -55,7 +55,22 @@ export class DocumentsService {
         .where("doc.id =:id", { id: id })
         .getOne();
 
-      if (documents?.password == pass) {
+      if(documents?.password == null && documents){
+        let response = {
+          id: documents.id,
+          title: documents.title,
+          content: documents.content,
+          owner: documents.user.userName,
+          createdAt: documents.createdAt,
+          updatedAt: documents.updatedAt
+        }
+
+        return response;
+      }
+
+      if ((documents?.password == pass || 
+        await bcrypt.compare(pass, documents!.password!)) && 
+        documents) {
 
         // await this.registrerAction(documents, documents.user!, "OPEN")
         let response = {
@@ -68,7 +83,8 @@ export class DocumentsService {
         }
 
         return response;
-      }
+      } 
+      
     } catch (error: any) {
       throw new HttpException(error.message, 500);
     }
