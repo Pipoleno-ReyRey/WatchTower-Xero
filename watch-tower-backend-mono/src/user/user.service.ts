@@ -330,19 +330,11 @@ export class UserService {
       userRole.user = dbUser!.userName;
       userRole.role = user.rol.id!;
 
-      // await this.roleUserRepository
-      //   .createQueryBuilder()
-      //   .delete()
-      //   .where("user = :user", { user: dbUser!.userName })
-      //   .execute();
-
       let audits = await this.auditRepo
         .createQueryBuilder()
         .select()
         .where("user = :user", { user: dbUser!.userName })
         .getMany();
-
-      // await this.auditRepo.createQueryBuilder().delete().where("user = :user", {user: dbUser!.userName}).execute();
 
       dbUser!.name = user.name;
       dbUser!.userName = user.userName;
@@ -351,8 +343,6 @@ export class UserService {
       dbUser!.pin = user.pin;
       
       await this.userRepository.save(dbUser!);
-      // await this.roleUserRepository.insert(userRole);
-      // await this.auditRepo.insert(audits);
       
     } catch (error: any) {
       throw new HttpException(error.message, 500);
