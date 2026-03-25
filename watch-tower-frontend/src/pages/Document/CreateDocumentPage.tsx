@@ -18,8 +18,10 @@ import { Switch } from "../../components/ui/switch";
 import { Input } from "../../components/ui/input";
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
+import { useDocument } from "../../hooks/useDocument";
 
 export const CreateDocumentPage = () => {
+  const { documentMutation } = useDocument();
   const form = useForm<CreateDocumentForm>({
     resolver: zodResolver(createDocumentSchema),
     mode: "onChange",
@@ -45,9 +47,10 @@ export const CreateDocumentPage = () => {
   function onSubmit(data: CreateDocumentForm) {
     const payload = {
       ...data,
-      pass: data.hasPass && data.pass ? data.pass : null,
+      pass: data.hasPass && data.pass ? data.pass : undefined,
     };
-    console.log("Documento creado", payload);
+
+    documentMutation.mutate(payload);
   }
 
   return (
