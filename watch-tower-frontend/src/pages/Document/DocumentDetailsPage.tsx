@@ -7,7 +7,6 @@ import {
   User,
 } from "lucide-react";
 
-import { useState } from "react";
 import { Button } from "../../components/ui/button";
 import {
   Card,
@@ -20,30 +19,18 @@ import { Label } from "../../components/ui/label";
 import { Link, useParams } from "react-router-dom";
 import { useDocument } from "../../hooks/useDocument";
 import { formatDate } from "../../utils/formatDate";
+import { useUnlockDocument } from "../../hooks/useUnlockDocument";
 
 export const DocumentDetailPage = () => {
   const { id } = useParams();
-
-  const [keyInput, setKeyInput] = useState("");
-  const [unlocked, setUnlocked] = useState(false);
-  const [keyError, setKeyError] = useState("");
+  const { keyError, keyInput, setKeyInput, handleUnlock, docData } =
+    useUnlockDocument();
 
   const { documentQuery } = useDocument();
 
-  // 🔥 buscar el documento en la data
   const doc = documentQuery.data?.find((d) => d.id === Number(id));
 
-  // if (documentQuery.isLoading) return <p>Cargando...</p>;
   if (!doc) return <p>Documento no encontrado</p>;
-
-  const handleUnlock = () => {
-    if (keyInput === "1234") {
-      setUnlocked(true);
-      setKeyError("");
-    } else {
-      setKeyError("Clave incorrecta");
-    }
-  };
 
   return (
     <div className="w-full space-y-3">
@@ -95,17 +82,18 @@ export const DocumentDetailPage = () => {
       </div>
 
       <Card>
-        {unlocked && (
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText size={16} />
-              Contenido del documento
-            </CardTitle>
-          </CardHeader>
-        )}
+        {doc.content ||
+          (docData && (
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText size={16} />
+                Contenido del documento
+              </CardTitle>
+            </CardHeader>
+          ))}
 
         <CardContent>
-          {doc.hasPass && !unlocked ? (
+          {doc.hasPass && !docData ? (
             <div className="flex items-center flex-col gap-4">
               <div className="flex flex-col items-center gap-3">
                 <Lock size={30} />
@@ -128,7 +116,7 @@ export const DocumentDetailPage = () => {
                   <p className="text-sm text-destructive">{keyError}</p>
                 )}
 
-                <Button className="w-full" onClick={handleUnlock}>
+                <Button className="w-full" onClick={() => handleUnlock(doc.id)}>
                   <Unlock />
                   Desbloquear
                 </Button>
