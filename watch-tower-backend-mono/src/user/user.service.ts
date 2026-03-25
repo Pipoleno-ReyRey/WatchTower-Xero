@@ -13,6 +13,7 @@ import { Repository } from "typeorm";
 import { JwtService } from "@nestjs/jwt";
 import { AuditLogEntity } from "core/entities/audit-logs.entity";
 import { use } from "passport";
+import { BlackListEntity } from "core/entities/black-list.entity";
 
 @Injectable()
 export class UserService {
@@ -27,6 +28,8 @@ export class UserService {
     private sessionRepository: Repository<SessionEntity>,
     @InjectRepository(AuditLogEntity)
     private auditRepo: Repository<AuditLogEntity>,
+    @InjectRepository(BlackListEntity)
+    private blackListRepo: Repository<BlackListEntity>,
     private readonly jwt: JwtService,
   ) { }
 
@@ -93,6 +96,17 @@ export class UserService {
 
   async getUser(user: LoginDto, ip: string): Promise<UserDto | any> {
     try {
+
+      let blackIps: BlackListEntity[] = await this.blackListRepo.find();
+      if(blackIps.filter(i => i.ip == ip)){
+        let audit: AuditLogEntity = new AuditLogEntity();
+          audit.action = "BLOCK_IP_LOGIN_TRY";
+          audit.ip = ip;
+
+          await this.auditRepo.save(audit);
+          return null;
+      }
+      
       let login: UserEntity | null = await this.userRepository
         .createQueryBuilder("uu")
         .innerJoinAndSelect("uu.roles", "roles")

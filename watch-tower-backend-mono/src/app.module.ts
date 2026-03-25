@@ -8,6 +8,7 @@ import { UserModule } from './user/user.module';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { DocumentsModule } from './documents/documents.module';
 import { AuditModule } from './audit/audit.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { AuditModule } from './audit/audit.module';
     UserModule,
     DocumentsModule,
     JwtModule,
-    AuditModule],
+    AuditModule,
+    DashboardModule],
   controllers: [AppController],
   providers: [AppService],
 })
