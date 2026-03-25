@@ -15,6 +15,4 @@ export class BlackListEntity {
   @Column({ name: "created_at", type: "timestamp", nullable: false, default: () => "CURRENT_TIMESTAMP" })
   createdAt!: Date;
 
-  @Column({ name: "active", type: "boolean", default: true })
-  active!: boolean;
 }

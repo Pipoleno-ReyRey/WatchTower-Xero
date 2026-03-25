@@ -1,4 +1,5 @@
 import { AuditLogEntity } from "core/entities/audit-logs.entity";
+import { BlackListEntity } from "core/entities/black-list.entity";
 import { DocsActionsEntity } from "core/entities/docs_actions.entity";
 import { DocumentEntity } from "core/entities/document.entity";
 import { PoliciesUserEntity } from "core/entities/policies-user.entity";
@@ -15,5 +16,6 @@ export const entitiesDb = [
     DocumentEntity,
     SessionEntity,
     DocsActionsEntity,
-    AuditLogEntity
+    AuditLogEntity,
+    BlackListEntity
 ]
