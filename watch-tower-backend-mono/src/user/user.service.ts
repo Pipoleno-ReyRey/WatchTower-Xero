@@ -13,6 +13,7 @@ import { Repository } from "typeorm";
 import { JwtService } from "@nestjs/jwt";
 import { AuditLogEntity } from "core/entities/audit-logs.entity";
 import { use } from "passport";
+import { BlackListEntity } from "core/entities/black-list.entity";
 
 @Injectable()
 export class UserService {
@@ -27,6 +28,8 @@ export class UserService {
     private sessionRepository: Repository<SessionEntity>,
     @InjectRepository(AuditLogEntity)
     private auditRepo: Repository<AuditLogEntity>,
+    @InjectRepository(BlackListEntity)
+    private blackListRepo: Repository<BlackListEntity>,
     private readonly jwt: JwtService,
   ) { }
 
@@ -91,8 +94,19 @@ export class UserService {
     }
   }
 
-  async getUser(user: LoginDto, ip: string): Promise<UserDto | any> {
+  async Loggin(user: LoginDto, ip: string): Promise<UserDto | any> {
     try {
+
+      let blackIps: BlackListEntity[] = await this.blackListRepo.find();
+      if(blackIps.filter(i => i.ip == ip).length > 0){
+        let audit: AuditLogEntity = new AuditLogEntity();
+          audit.action = "BLOCK_IP_LOGIN_TRY";
+          audit.ip = ip;
+
+          await this.auditRepo.save(audit);
+          return null;
+      }
+      
       let login: UserEntity | null = await this.userRepository
         .createQueryBuilder("uu")
         .innerJoinAndSelect("uu.roles", "roles")
@@ -132,6 +146,10 @@ export class UserService {
             email: login.email,
             role: roles,
           };
+
+          login.status = true;
+          await this.userRepository.save(login);
+
           return {
             ...response,
             token: this.jwt.sign(response),
@@ -152,6 +170,25 @@ export class UserService {
 
         await this.auditRepo.save(audit);
         return null;
+      }
+    } catch (error: any) {
+      throw new HttpException(error.message, 500);
+    }
+  }
+
+  async logout(user: UserDto, ip: string) {
+    try {
+      let dbUser = await this.userRepository.findOne({ where: { userName: user.userName } });
+      if (dbUser) {
+        dbUser.status = false;
+        await this.userRepository.save(dbUser);
+
+        let audit: AuditLogEntity = new AuditLogEntity();
+        audit.action = "LOGOUT";
+        audit.ip = ip;
+        audit.user = dbUser;
+
+        await this.auditRepo.save(audit);
       }
     } catch (error: any) {
       throw new HttpException(error.message, 500);

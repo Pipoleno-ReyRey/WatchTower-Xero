@@ -13,7 +13,7 @@ export class UserController {
 
   @Post("/login")
   async loginUser(@Body() login: LoginDto, @Req() req) {
-    let response = await this.userService.getUser(login, req.ip);
+    let response = await this.userService.Loggin(login, req.ip);
     if(!response){
       throw new UnauthorizedException;
     } else {
