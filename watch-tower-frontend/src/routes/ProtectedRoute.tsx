@@ -5,7 +5,7 @@ export const ProtectedRoute = () => {
   const valid = isTokenValid();
 
   if (!valid) {
-    localStorage.removeItem("token");
+    localStorage.removeItem("currentUser");
     return <Navigate to="/login" replace />;
   }
 

@@ -7,9 +7,11 @@ import { ToastContainer } from "react-toastify";
 
 import { Loader } from "../components/common/Loader";
 import { useIsFetching } from "@tanstack/react-query";
+import { useStore } from "../store/appStore";
 
 export const MainLayout = () => {
   const fetching = useIsFetching();
+  const loading = useStore((s) => s.loading);
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -20,6 +22,7 @@ export const MainLayout = () => {
         <main className="flex flex-1 flex-col p-4 overflow-hidden">
           <Outlet />
           {fetching > 0 && <Loader />}
+          {loading && <Loader />}
         </main>
       </SidebarInset>
       <ToastContainer />

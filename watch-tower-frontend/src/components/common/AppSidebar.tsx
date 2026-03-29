@@ -1,4 +1,11 @@
-import { ChevronLeft, ChevronRight, Badge, Eye, LogOut } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  LogOut,
+  Moon,
+  Sun,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -17,18 +24,19 @@ import { Separator } from "../ui/separator";
 
 import { NavLink } from "react-router-dom";
 import { navItems } from "../../routes/nav-items";
+import { getCurrentUser } from "../../lib/axios";
+import { useTheme } from "next-themes";
 
 export default function AppSidebar() {
   const { state, toggleSidebar } = useSidebar();
+  const { theme, setTheme } = useTheme();
+
   const collapsed = state === "collapsed";
 
-  const currentUser = {
-    name: "Estarlin Germán",
-    role: "admin",
-  };
+  const currentUser = getCurrentUser();
 
   return (
-    <Sidebar collapsible="icon" className="border-none">
+    <Sidebar collapsible="icon" className="border-r">
       {/* LOGO */}
       <SidebarHeader>
         <div className="flex h-16 items-center gap-3 px-3">
@@ -80,21 +88,32 @@ export default function AppSidebar() {
       {/* USER SECTION */}
       <SidebarFooter>
         {!collapsed && (
-          <div className="mb-3 flex items-center gap-3 rounded-lg bg-muted px-3 py-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-primary">
-              {currentUser.name
-                .split(" ")
-                .map((n) => n[0])
-                .join("")}
+          <div className="flex-col">
+            <div className="mb-3 flex items-center gap-3 rounded-lg bg-muted px-3 py-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-primary">
+                {currentUser?.userName
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase()}
+              </div>
+
+              <div className="flex flex-col">
+                <span className="text-sm font-medium">
+                  {currentUser?.userName}
+                </span>
+              </div>
             </div>
 
-            <div className="flex flex-col">
-              <span className="text-sm font-medium">{currentUser.name}</span>
-
-              <Badge className="mt-0.5 w-fit border-primary/30 px-1.5 py-0 text-[10px] text-primary">
-                {currentUser.role.toUpperCase()}
-              </Badge>
-            </div>
+            <Button
+              variant="ghost"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="w-full bg-muted flex justify-start gap-4"
+              size={"lg"}
+            >
+              {theme === "dark" ? <Moon size={50} /> : <Sun size={50} />}
+              {theme === "dark" ? "Modo claro" : "Modo lenny"}
+            </Button>
           </div>
         )}
 

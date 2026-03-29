@@ -23,7 +23,7 @@ import { useUnlockDocument } from "../../hooks/useUnlockDocument";
 
 export const DocumentDetailPage = () => {
   const { id } = useParams();
-  const { keyError, keyInput, setKeyInput, handleUnlock, docData } =
+  const { keyError, keyInput, setKeyInput, handleUnlock, docData, isLoading } =
     useUnlockDocument();
 
   const { documentQuery } = useDocument();
@@ -82,19 +82,21 @@ export const DocumentDetailPage = () => {
       </div>
 
       <Card>
-        {doc.content ||
-          (docData && (
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText size={16} />
-                Contenido del documento
-              </CardTitle>
-            </CardHeader>
-          ))}
+        {/* HEADER */}
+        {(doc.content || docData) && (
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText size={16} />
+              Contenido del documento
+            </CardTitle>
+          </CardHeader>
+        )}
 
+        {/* CONTENT */}
         <CardContent>
           {doc.hasPass && !docData ? (
-            <div className="flex items-center flex-col gap-4">
+            // 🔒 Documento con clave y aún NO desbloqueado
+            <div className="flex items-center flex-col gap-4 w-full">
               <div className="flex flex-col items-center gap-3">
                 <Lock size={30} />
                 <p className="text-sm text-muted-foreground">
@@ -102,7 +104,7 @@ export const DocumentDetailPage = () => {
                 </p>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 w-sm">
                 <Label>Clave</Label>
 
                 <Input
@@ -113,18 +115,24 @@ export const DocumentDetailPage = () => {
                 />
 
                 {keyError && (
-                  <p className="text-sm text-destructive">{keyError}</p>
+                  <div className="w-full">
+                    <p className="text-sm text-destructive">{keyError}</p>
+                  </div>
                 )}
 
-                <Button className="w-full" onClick={() => handleUnlock(doc.id)}>
+                <Button
+                  disabled={isLoading}
+                  className="w-full"
+                  onClick={() => handleUnlock(doc.id)}
+                >
                   <Unlock />
-                  Desbloquear
+                  {isLoading ? "Desbloqueando..." : "Desbloquear"}
                 </Button>
               </div>
             </div>
           ) : (
             <p className="text-sm leading-relaxed">
-              {doc.content ?? "Sin contenido"}
+              {docData ?? doc.content ?? "Sin contenido"}
             </p>
           )}
         </CardContent>

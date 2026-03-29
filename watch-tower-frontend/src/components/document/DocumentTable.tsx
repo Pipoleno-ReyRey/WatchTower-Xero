@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import type { IDocument } from "../../schemas/document";
 
 import { Button } from "../ui/button";
@@ -11,13 +12,30 @@ import {
   TableRow,
 } from "../ui/table";
 
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "../ui/pagination";
+
 interface Props {
   documents: IDocument[];
 }
 
 export const DocumentTable = ({ documents }: Props) => {
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+
+  const totalPages = Math.ceil(documents.length / pageSize);
+
+  const paginatedData = documents.slice((page - 1) * pageSize, page * pageSize);
+
   return (
-    <div className="w-full">
+    <div className="w-full space-y-4">
+      {/* TABLE */}
       <div className="[&>div]:rounded-sm [&>div]:border">
         <Table>
           <TableHeader>
@@ -26,19 +44,19 @@ export const DocumentTable = ({ documents }: Props) => {
               <TableHead>Propietario</TableHead>
               <TableHead>Creado</TableHead>
               <TableHead>Actualizado</TableHead>
-
-              <TableHead className=""></TableHead>
+              <TableHead></TableHead>
             </TableRow>
           </TableHeader>
+
           <TableBody>
-            {documents.map((d) => (
+            {paginatedData.map((d) => (
               <TableRow key={d.id}>
                 <TableCell>
-                  <div className="flex items-center gap-3">
-                    <div className="font-medium">{d.title}</div>
-                  </div>
+                  <div className="font-medium">{d.title}</div>
                 </TableCell>
+
                 <TableCell>{d.owner}</TableCell>
+
                 <TableCell>
                   {new Date(d.createdAt).toLocaleDateString("es-DO")}
                 </TableCell>
@@ -47,9 +65,9 @@ export const DocumentTable = ({ documents }: Props) => {
                   {new Date(d.updatedAt).toLocaleDateString("es-DO")}
                 </TableCell>
 
-                <TableCell className="">
+                <TableCell>
                   <Link to={`${d.id}`}>
-                    <Button size={"sm"}>Ver</Button>
+                    <Button size="sm">Ver</Button>
                   </Link>
                 </TableCell>
               </TableRow>
@@ -57,6 +75,45 @@ export const DocumentTable = ({ documents }: Props) => {
           </TableBody>
         </Table>
       </div>
+
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              size={"lg"}
+              onClick={() => setPage((p) => Math.max(p - 1, 1))}
+              className={page === 1 ? "pointer-events-none opacity-50" : ""}
+            />
+          </PaginationItem>
+
+          {Array.from({ length: totalPages }).map((_, i) => {
+            const pageNumber = i + 1;
+
+            return (
+              <PaginationItem key={pageNumber}>
+                <PaginationLink
+                  isActive={page === pageNumber}
+                  onClick={() => setPage(pageNumber)}
+                  size={"lg"}
+                >
+                  {pageNumber}
+                </PaginationLink>
+              </PaginationItem>
+            );
+          })}
+
+          {/* NEXT */}
+          <PaginationItem>
+            <PaginationNext
+              onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+              className={
+                page === totalPages ? "pointer-events-none opacity-50" : ""
+              }
+              size={"lg"}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
     </div>
   );
 };

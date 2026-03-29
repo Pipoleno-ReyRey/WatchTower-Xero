@@ -4,7 +4,7 @@ import { Card, CardContent } from "../ui/card";
 interface Props {
   icon: LucideIcon;
   label: string;
-  data: string;
+  data: string | number;
 }
 
 export const Stat = ({ label, data, icon: Icon }: Props) => {
