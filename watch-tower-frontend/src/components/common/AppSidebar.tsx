@@ -112,7 +112,7 @@ export default function AppSidebar() {
               size={"lg"}
             >
               {theme === "dark" ? <Moon size={50} /> : <Sun size={50} />}
-              {theme === "dark" ? "Modo claro" : "Modo lenny"}
+              {theme === "dark" ? "Modo lenny" : "Modo claro"}
             </Button>
           </div>
         )}

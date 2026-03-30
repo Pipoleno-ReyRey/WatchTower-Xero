@@ -45,9 +45,13 @@ export const routes = createBrowserRouter([
             element: <RolePage />,
           },
           {
-            path: "dashboard",
-            index: true,
-            element: <DashboardPage />,
+            element: <ProtectedRoute allowedRoles={["admin"]} />,
+            children: [
+              {
+                path: "dashboard",
+                element: <DashboardPage />,
+              },
+            ],
           },
           {
             path: "documents",
