@@ -64,7 +64,7 @@ export class UserController {
   @UseGuards(AuthGuard)
   async patchUser(@Body() user: UpdateUser, @Req() req){
     if(req.info.role[0].role == "admin"){
-      return await this.userService.update(user);
+      return await this.userService.update(user, req.ip);
     } else {
       throw new UnauthorizedException();
     }
