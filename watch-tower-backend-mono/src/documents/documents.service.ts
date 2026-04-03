@@ -144,10 +144,11 @@ export class DocumentsService {
 
   }
 
-  async updateDoc(update: updateDocDTO, u: UserDto, ip: string) {
+  async updateDoc(update: updateDocDTO, u: UserDto, ip: string, id: number) {
+    let user: UserEntity | null = await this.userRepo.findOne({ where: { userName: u.userName } });
+
     try {
-      let user: UserEntity | null = await this.userRepo.findOne({ where: { userName: u.userName } });
-      let doc = await this.docRepo.findOne({ where: { id: update.id } });
+      let doc = await this.docRepo.findOne({ where: { id: id } });
 
       if ((user && doc) && (u.role![0].id == 1 || doc.user == user)) {
         doc.title = update.title;
@@ -158,10 +159,13 @@ export class DocumentsService {
         audit.action = "UPDATE_DOCUMENT";
         audit.ip = ip;
         audit.description = "Actualizacion de documento";
+        audit.user = user;
         audit.success = true;
 
         await this.auditRepo.save(audit);
         await this.docRepo.save(doc);
+      } else {
+        throw new UnauthorizedException();
       }
     } catch (error: any) {
       let audit: AuditLogEntity = new AuditLogEntity();
@@ -169,6 +173,7 @@ export class DocumentsService {
       audit.ip = ip;
       audit.description = "Actualizacion de documento";
       audit.success = false;
+      audit.user = user!;
 
       await this.auditRepo.save(audit);
       throw new HttpException(error.message, 500);

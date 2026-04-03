@@ -19,10 +19,8 @@ export class createDocDTO{
 }
 
 export class updateDocDTO{
-    id!: number;
     title!: string;
-    modifier!: string;
     content!: string;
-    hassPass!: boolean;
+    hassPass?: boolean;
     pass?: string | null;
 }

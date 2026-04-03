@@ -81,6 +81,8 @@ export class UserService {
       audit.action = "CREATED_USER";
       audit.ip = ip;
       audit.user = newUser;
+      audit.description = "Creacion de usuario",
+      audit.success = true;
 
       await this.auditRepo.save(audit);
       return {
