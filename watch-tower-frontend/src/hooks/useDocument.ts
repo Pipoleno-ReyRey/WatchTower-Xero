@@ -21,14 +21,13 @@ export const useDocument = () => {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["documents"] });
 
+      navigate("/documents");
       await Swal.fire({
         icon: "success",
         title: "Documento creado",
         text: "Se guardó correctamente",
         confirmButtonText: "OK",
       });
-
-      navigate("/documents");
     },
 
     onError: () => {

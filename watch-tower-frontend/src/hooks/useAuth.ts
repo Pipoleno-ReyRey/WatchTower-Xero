@@ -9,7 +9,8 @@ export const useAuth = () => {
   const handleLogin = async (data: ILogin) => {
     try {
       const res = await login(data);
-      localStorage.setItem("token", res.token);
+      console.log(res)
+      localStorage.setItem("currentUser", JSON.stringify(res));
       navigation("/dashboard");
     } catch (error) {
       toast.error("Error de credenciales");

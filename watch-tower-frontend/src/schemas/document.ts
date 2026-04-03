@@ -8,13 +8,10 @@ export const createDocumentSchema = z
     hasPass: z.boolean(),
     pass: z.string().optional(), // 👈 sin min
   })
-  .refine(
-    (data) => !data.hasPass || (data.pass && data.pass.length > 0),
-    {
-      message: "La clave es requerida",
-      path: ["pass"],
-    }
-  );
+  .refine((data) => !data.hasPass || (data.pass && data.pass.length > 0), {
+    message: "La clave es requerida",
+    path: ["pass"],
+  });
 
 export const documentSchema = z.object({
   id: z.number(),
@@ -35,3 +32,6 @@ export const unlockDocumentSchema = z.object({
 export type CreateDocumentForm = z.infer<typeof createDocumentSchema>;
 export type IDocument = z.infer<typeof documentSchema>;
 export type UnlockDocumentForm = z.infer<typeof unlockDocumentSchema>;
+export type UnLockResponse = {
+  content: string;
+};

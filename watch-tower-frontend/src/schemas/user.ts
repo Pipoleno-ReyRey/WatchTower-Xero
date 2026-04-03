@@ -35,6 +35,12 @@ export const userSchema = userCreateSchema
   .extend({
     id: z.number(),
     status: z.boolean(),
+    risk: z.string().optional(),
+
+    roles: z
+      .array(roleSchema)
+      .min(1)
+      .transform((roles) => roles[0]),
   });
 
 export type IUserForm = z.infer<typeof userCreateSchema>;

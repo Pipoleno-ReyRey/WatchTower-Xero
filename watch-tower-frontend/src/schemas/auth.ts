@@ -13,12 +13,27 @@ export const loginSchema = z.object({
     .max(6, "PIN debe tener 6 dígitos"),
 });
 
-export type AuthResponse = {
-  userName: string;
-  email: string;
-  role: string[];
-  token: string;
-};
+// 🔹 Schema
+export const authResponseSchema = z.object({
+  userName: z.string(),
+  email: z.string().email(),
+  role: z.array(
+    z.object({
+      id: z.number(),
+      role: z.string(),
+    }),
+  ),
+  token: z.string(),
+});
+
+// 🔹 Tipo inferido
+export type AuthResponse = z.infer<typeof authResponseSchema>;
+// export type AuthResponse = {
+//   userName: string;
+//   email: string;
+//   role: Role[];
+//   token: string;
+// };
 
 // {
 //     "userName": "jugonzales",

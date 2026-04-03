@@ -36,9 +36,13 @@ export const UserPage = () => {
     userQuery.data,
   );
 
-  // const totalUsers = filteredData.length;
-  // const usersEnabled = filteredData.filter((u) => u.status === true).length;
-  // const usersDisabled = filteredData.filter((u) => !u.status).length;
+  const totalUsers = filteredData?.length ?? 0;
+
+  const usersEnabled =
+    filteredData?.filter((u) => u.status === true).length ?? 0;
+
+  const usersDisabled =
+    filteredData?.filter((u) => u.status === false).length ?? 0;
 
   return (
     <>
@@ -55,10 +59,10 @@ export const UserPage = () => {
         </div>
 
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4">
-          <Stat label="Total usuarios" icon={User2} data={"8"} />
-          <Stat label="Activo" icon={Shield} data={"8"} />
-          <Stat label="Bloqueado" icon={LockKeyhole} data={"0"} />
-          <Stat label="Alto riesgo" icon={TriangleAlert} data="2" />
+          <Stat label="Total usuarios" icon={User2} data={totalUsers} />
+          <Stat label="Activo" icon={Shield} data={usersEnabled} />
+          <Stat label="Bloqueado" icon={LockKeyhole} data={usersDisabled} />
+          <Stat label="Alto riesgo" icon={TriangleAlert} data={"0"} />
         </div>
 
         <Card>

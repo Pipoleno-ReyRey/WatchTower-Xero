@@ -13,26 +13,27 @@ import { Button } from "../../components/ui/button";
 import { Link } from "react-router-dom";
 
 import { useDocument } from "../../hooks/useDocument";
+import { getCurrentUser } from "../../lib/axios";
+import { useSearch } from "../../hooks/useSearch";
 
 export const DocumentPage = () => {
   const { documentQuery } = useDocument();
-  const roleOptions = [
-    { label: "Administrador", value: "1" },
-    { label: "Usuario", value: "2" },
+  const user = getCurrentUser();
+
+  const { search, setSearch, setFilter, filteredData } = useSearch(
+    documentQuery.data,
+  );
+
+  const documentFilter = [
+    { label: "Todos", value: "1" },
+    { label: "Mis documentos", value: user?.userName || "2" },
   ];
 
-  const statusOptions = [
-    { label: "Activo", value: "1" },
-    { label: "Inactivo", value: "2" },
-    { label: "Bloqueado", value: "3" },
-  ];
   return (
     <div className="w-full space-y-3">
       <div className="py-4 flex justify-between items-center">
         <h2 className="font-bold text-2xl">Documentos</h2>
 
-        {/* <DocumentModal />
-         */}
         <Link to={"./create"}>
           <Button className="cursor-pointer">
             <Plus />
@@ -43,31 +44,42 @@ export const DocumentPage = () => {
 
       <Card>
         <CardContent className="grid grid-cols-1 gap-2 lg:grid-cols-4">
+          {/* 🔎 SEARCH */}
           <div className="lg:col-span-3">
             <InputGroup>
-              <InputGroupInput placeholder="Buscar nombre o propietario..." />
+              <InputGroupInput
+                placeholder="Buscar nombre o propietario..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
               <InputGroupAddon>
                 <SearchIcon />
               </InputGroupAddon>
             </InputGroup>
           </div>
 
+          {/* 🎯 FILTER */}
           <div className="flex gap-2 items-center lg:col-span-1">
             <Filter size={30} className="hidden lg:block" />
 
             <CustomSelect
-              placeholder="Roles"
-              options={roleOptions}
-              className="lg:w-44"
+              placeholder="Documentos"
+              options={documentFilter}
+              onValueChange={(value) => {
+                if (value === "1") {
+                  setFilter("owner", undefined);
+                } else {
+                  setFilter("owner", user?.userName);
+                }
+              }}
             />
-
-            <CustomSelect placeholder="Estado" options={statusOptions} />
           </div>
         </CardContent>
       </Card>
+
       <Card>
         <CardContent>
-          <DocumentTable documents={documentQuery.data ?? []} />
+          <DocumentTable documents={filteredData} />
         </CardContent>
       </Card>
     </div>

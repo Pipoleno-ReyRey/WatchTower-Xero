@@ -3,6 +3,7 @@
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
+
 @font-face {
   font-family: "MiFuente";
   src: url("./assets/fonts/Poppins-Regular.ttf") format("truetype");
@@ -10,96 +11,101 @@
   font-style: normal;
 }
 
+/* 🌿 LIGHT THEME (verde tipo #40AC80) */
 :root {
-  --background: oklch(0.96 0.01 271.34);
-  --foreground: oklch(0.21 0.03 263.61);
+  --background: oklch(0.97 0.01 270);
+  --foreground: oklch(0.22 0.02 260);
 
-  --card: oklch(0.98 0.01 271.41);
-  --card-foreground: oklch(0.21 0.03 263.61);
+  --card: oklch(0.99 0.01 270);
+  --card-foreground: oklch(0.22 0.02 260);
 
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.21 0.03 263.61);
+  --popover-foreground: oklch(0.22 0.02 260);
 
-  --primary: oklch(0.48 0.2 260.47);
+  --primary: oklch(0.58 0.13 160);
   --primary-foreground: oklch(1 0 0);
 
-  --secondary: oklch(0.91 0.02 274.06);
-  --secondary-foreground: oklch(0.37 0.03 259.73);
+  --secondary: oklch(0.92 0.02 270);
+  --secondary-foreground: oklch(0.35 0.02 260);
 
-  --muted: oklch(0.94 0.02 274.86);
-  --muted-foreground: oklch(0.55 0.02 264.41);
+  --muted: oklch(0.94 0.01 270);
+  --muted-foreground: oklch(0.55 0.01 260);
 
-  --accent: oklch(0.95 0.02 260.18);
-  --accent-foreground: oklch(0.48 0.2 260.47);
+  --accent: oklch(0.9 0.03 160);
+  --accent-foreground: oklch(0.35 0.08 160);
 
-  --destructive: oklch(0.58 0.22 27.29);
+  --destructive: oklch(0.6 0.2 30);
 
-  --border: oklch(0.89 0.02 259.43);
-  --input: oklch(0.9 0.01 266.73);
-  --ring: oklch(0.48 0.2 260.47);
+  --border: oklch(0.88 0.01 260);
+  --input: oklch(0.9 0.01 260);
 
-  --chart-1: oklch(0.48 0.2 260.47);
-  --chart-2: oklch(0.56 0.24 260.92);
-  --chart-3: oklch(0.4 0.16 259.61);
-  --chart-4: oklch(0.43 0.16 259.82);
-  --chart-5: oklch(0.29 0.07 261.2);
+  --ring: oklch(0.58 0.13 160);
 
-  --sidebar: oklch(0.97 0 0);
-  --sidebar-foreground: oklch(0.21 0.03 263.61);
-  --sidebar-primary: oklch(0.48 0.2 260.47);
+  --chart-1: oklch(0.58 0.13 160);
+  --chart-2: oklch(0.55 0.14 155);
+  --chart-3: oklch(0.5 0.12 150);
+  --chart-4: oklch(0.45 0.1 145);
+  --chart-5: oklch(0.4 0.08 140);
+
+  --sidebar: oklch(0.98 0.01 270);
+  --sidebar-foreground: oklch(0.22 0.02 260);
+  --sidebar-primary: oklch(0.58 0.13 160);
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.95 0.02 260.18);
-  --sidebar-accent-foreground: oklch(0.48 0.2 260.47);
-  --sidebar-border: oklch(0.93 0.01 261.82);
-  --sidebar-ring: oklch(0.48 0.2 260.47);
+  --sidebar-accent: oklch(0.9 0.03 160);
+  --sidebar-accent-foreground: oklch(0.35 0.08 160);
+  --sidebar-border: oklch(0.9 0.01 260);
+  --sidebar-ring: oklch(0.58 0.13 160);
 
   --radius: 0.5rem;
 }
 
+/* 🌙 DARK THEME (verde + gris oscuro elegante) */
 .dark {
-  --background: oklch(0.26 0.03 262.67);
-  --foreground: oklch(0.93 0.01 261.82);
+  --background: oklch(0.22 0.02 260);
+  --foreground: oklch(0.92 0.01 260);
 
-  --card: oklch(0.35 0.02 255.68);
-  --card-foreground: oklch(0.93 0.01 261.82);
+  --card: oklch(0.26 0.02 260);
+  --card-foreground: oklch(0.92 0.01 260);
 
-  --popover: oklch(0.35 0.02 255.68);
-  --popover-foreground: oklch(0.93 0.01 261.82);
+  --popover: oklch(0.26 0.02 260);
+  --popover-foreground: oklch(0.92 0.01 260);
 
-  --primary: oklch(0.56 0.24 260.92);
-  --primary-foreground: oklch(1 0 0);
+  --primary: oklch(0.65 0.14 160);
+  --primary-foreground: oklch(0.1 0 0);
 
-  --secondary: oklch(0.35 0.04 261.4);
-  --secondary-foreground: oklch(0.93 0.01 261.82);
+  --secondary: oklch(0.3 0.02 260);
+  --secondary-foreground: oklch(0.92 0.01 260);
 
-  --muted: oklch(0.3 0.03 260.51);
-  --muted-foreground: oklch(0.71 0.02 261.33);
+  --muted: oklch(0.28 0.02 260);
+  --muted-foreground: oklch(0.7 0.01 260);
 
-  --accent: oklch(0.33 0.04 264.63);
-  --accent-foreground: oklch(0.93 0.01 261.82);
+  --accent: oklch(0.32 0.04 160);
+  --accent-foreground: oklch(0.9 0.02 160);
 
-  --destructive: oklch(0.64 0.21 25.39);
+  --destructive: oklch(0.64 0.21 25);
 
-  --border: oklch(0.35 0.04 261.4);
-  --input: oklch(0.35 0.04 261.4);
-  --ring: oklch(0.56 0.24 260.92);
+  --border: oklch(0.3 0.02 260);
+  --input: oklch(0.3 0.02 260);
 
-  --chart-1: oklch(0.56 0.24 260.92);
-  --chart-2: oklch(0.48 0.2 260.47);
-  --chart-3: oklch(0.69 0.17 255.59);
-  --chart-4: oklch(0.43 0.16 259.82);
-  --chart-5: oklch(0.29 0.07 261.2);
+  --ring: oklch(0.65 0.14 160);
 
-  --sidebar: oklch(0.26 0.03 262.67);
-  --sidebar-foreground: oklch(0.93 0.01 261.82);
-  --sidebar-primary: oklch(0.56 0.24 260.92);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.33 0.04 264.63);
-  --sidebar-accent-foreground: oklch(0.93 0.01 261.82);
-  --sidebar-border: oklch(0.35 0.04 261.4);
-  --sidebar-ring: oklch(0.56 0.24 260.92);
+  --chart-1: oklch(0.65 0.14 160);
+  --chart-2: oklch(0.6 0.13 155);
+  --chart-3: oklch(0.55 0.12 150);
+  --chart-4: oklch(0.5 0.1 145);
+  --chart-5: oklch(0.45 0.08 140);
+
+  --sidebar: oklch(0.22 0.02 260);
+  --sidebar-foreground: oklch(0.92 0.01 260);
+  --sidebar-primary: oklch(0.65 0.14 160);
+  --sidebar-primary-foreground: oklch(0.1 0 0);
+  --sidebar-accent: oklch(0.32 0.04 160);
+  --sidebar-accent-foreground: oklch(0.92 0.01 260);
+  --sidebar-border: oklch(0.3 0.02 260);
+  --sidebar-ring: oklch(0.65 0.14 160);
 }
 
+/* 🔧 SHADCN MAPPING */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -142,19 +148,12 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
-  --shadow-2xs: var(--shadow-2xs);
-  --shadow-xs: var(--shadow-xs);
-  --shadow-sm: var(--shadow-sm);
-  --shadow: var(--shadow);
-  --shadow-md: var(--shadow-md);
-  --shadow-lg: var(--shadow-lg);
-  --shadow-xl: var(--shadow-xl);
-  --shadow-2xl: var(--shadow-2xl);
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
 }
 
+/* 🌍 GLOBAL */
 body {
   font-family: "MiFuente", sans-serif;
 }
@@ -163,6 +162,7 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -170,6 +170,7 @@ body {
   body[data-scroll-locked][data-scroll-locked] {
     overflow: auto !important;
   }
+
   body[data-scroll-locked] {
     margin-right: 0 !important;
   }

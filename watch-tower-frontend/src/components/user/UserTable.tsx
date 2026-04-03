@@ -1,4 +1,5 @@
 import { UserRoundCog } from "lucide-react";
+import { useState } from "react";
 import type { IUser } from "../../schemas/user";
 
 import {
@@ -9,8 +10,17 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "../ui/pagination";
+
 import { Button } from "../ui/button";
-// import { useStore } from "../../store/appStore";
 import { useNavigate } from "react-router-dom";
 
 interface Props {
@@ -18,11 +28,19 @@ interface Props {
 }
 
 export const UserTable = ({ users }: Props) => {
-  // const openEdit = useStore((s) => s.openEdit);
   const navigate = useNavigate();
 
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+
+  const totalPages = Math.ceil(users.length / pageSize);
+
+  const paginatedData = users.slice((page - 1) * pageSize, page * pageSize);
+  console.log(users[0]);
+
   return (
-    <div className="w-full">
+    <div className="w-full space-y-4">
+      {/* TABLE */}
       <div className="[&>div]:rounded-sm [&>div]:border">
         <Table>
           <TableHeader>
@@ -36,25 +54,21 @@ export const UserTable = ({ users }: Props) => {
           </TableHeader>
 
           <TableBody>
-            {users.map((item) => (
+            {paginatedData.map((item) => (
               <TableRow key={item.userName}>
                 <TableCell className="font-medium">{item.userName}</TableCell>
 
                 <TableCell>{item.email}</TableCell>
 
-                <TableCell>{item.roles?.[0]?.role ?? "Sin rol"}</TableCell>
+                <TableCell>{item.roles?.role ?? "Sin rol"}</TableCell>
 
-                <TableCell>
-                  {item.status === true ? "Activo" : "Bloqueado"}
-                </TableCell>
+                <TableCell>{item.status ? "Activo" : "Bloqueado"}</TableCell>
 
                 <TableCell>
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => {
-                      navigate(`${item.id}`);
-                    }}
+                    onClick={() => navigate(`${item.id}`)}
                   >
                     <UserRoundCog size={18} />
                   </Button>
@@ -64,6 +78,44 @@ export const UserTable = ({ users }: Props) => {
           </TableBody>
         </Table>
       </div>
+
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              onClick={() => setPage((p) => Math.max(p - 1, 1))}
+              className={page === 1 ? "pointer-events-none opacity-50" : ""}
+              size={"lg"}
+            />
+          </PaginationItem>
+
+          {Array.from({ length: totalPages }).map((_, i) => {
+            const pageNumber = i + 1;
+
+            return (
+              <PaginationItem key={pageNumber}>
+                <PaginationLink
+                  isActive={page === pageNumber}
+                  onClick={() => setPage(pageNumber)}
+                  size={"lg"}
+                >
+                  {pageNumber}
+                </PaginationLink>
+              </PaginationItem>
+            );
+          })}
+
+          <PaginationItem>
+            <PaginationNext
+              onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+              className={
+                page === totalPages ? "pointer-events-none opacity-50" : ""
+              }
+              size={"lg"}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
     </div>
   );
 };
