@@ -19,7 +19,7 @@ import { useAuth } from "../hooks/useAuth";
 
 export const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const { handleLogin } = useAuth();
+  const { handleLogin, isLoading } = useAuth();
   const form = useForm<ILogin>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -31,10 +31,7 @@ export const LoginPage = () => {
   });
 
   function onSubmit(data: ILogin) {
-
     handleLogin(data);
-    // toast.success("Login enviado con exito");
-    // Swal.fire("Exito", "Pase la prueba", "success");
   }
 
   return (
@@ -129,7 +126,9 @@ export const LoginPage = () => {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="login-pin">PIN de seguridad</FieldLabel>
+                    <FieldLabel htmlFor="login-pin">
+                      PIN de seguridad
+                    </FieldLabel>
 
                     <div className="relative">
                       <KeyRound className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -156,9 +155,9 @@ export const LoginPage = () => {
             <Button
               type="submit"
               className="w-full"
-              disabled={!form.formState.isValid}
+              disabled={!form.formState.isValid || isLoading}
             >
-              Iniciar
+              {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
             </Button>
           </form>
         </CardContent>

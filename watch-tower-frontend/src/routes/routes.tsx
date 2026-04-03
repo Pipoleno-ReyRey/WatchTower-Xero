@@ -11,6 +11,8 @@ import { CreateDocumentPage } from "../pages/Document/CreateDocumentPage";
 import { DocumentDetailPage } from "../pages/Document/DocumentDetailsPage";
 import { RolePage } from "../pages/RolePage";
 import { UserForm } from "../components/user/UserForm";
+// import { NotFoundPage } from "../pages/NotFoundPage";
+import { AuditPage } from "../pages/AuditPage";
 
 export const routes = createBrowserRouter([
   {
@@ -71,10 +73,15 @@ export const routes = createBrowserRouter([
               },
             ],
           },
+          {
+            path: "audit",
+            element: <AuditPage />,
+          },
         ],
       },
     ],
   },
+  // { path: "/unauthorized", element: <NotFoundPage /> },
 
   { path: "*", element: <Navigate to="/login" replace /> },
 ]);

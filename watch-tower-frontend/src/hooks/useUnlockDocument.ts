@@ -12,6 +12,10 @@ export const useUnlockDocument = () => {
 
   const handleUnlock = async (id: number) => {
     try {
+      if (keyInput.trim() === "") {
+        setKeyError("Por favor, ingrese la clave");
+        return;
+      }
       setIsLoading(true);
       const response = await unLockDocument(id, keyInput);
 

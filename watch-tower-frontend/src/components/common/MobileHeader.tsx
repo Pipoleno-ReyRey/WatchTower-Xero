@@ -6,7 +6,7 @@ export function MobileHeader() {
   const { setOpenMobile } = useSidebar();
 
   return (
-    <header className="flex h-14 items-center border-b bg-background px-4 md:hidden">
+    <header className="flex h-14 items-center border-b bg-background px-4 lg:hidden">
       <Button variant="ghost" size="icon" onClick={() => setOpenMobile(true)}>
         <Menu className="h-5 w-5" />
       </Button>

@@ -23,7 +23,7 @@ export const DashboardPage = () => {
   const { dashboardQuery } = useDashboard();
   return (
     <div className=" w-full">
-      <div className="mx-auto max-w-7xl space-y-3">
+      <div className="space-y-3">
         <div className="py-4 flex justify-between items-center">
           <h2 className="font-bold text-2xl">Dashboard de seguridad</h2>
         </div>

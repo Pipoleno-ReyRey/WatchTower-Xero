@@ -2,8 +2,9 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { createDocument, getAllDocument } from "../services/document-service";
 import { queryClient } from "../lib/react-query";
 import type { CreateDocumentForm } from "../schemas/document";
-import Swal from "sweetalert2";
+
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export const useDocument = () => {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ export const useDocument = () => {
     queryFn: getAllDocument,
     staleTime: 1000 * 60 * 5,
     refetchInterval: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
   });
 
   const documentMutation = useMutation({
@@ -20,22 +22,12 @@ export const useDocument = () => {
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["documents"] });
-
       navigate("/documents");
-      await Swal.fire({
-        icon: "success",
-        title: "Documento creado",
-        text: "Se guardó correctamente",
-        confirmButtonText: "OK",
-      });
+      toast.success("Documento creado correctamente");
     },
 
     onError: () => {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "No se pudo crear el documento",
-      });
+      toast.error("Error al crear el documento");
     },
   });
 
