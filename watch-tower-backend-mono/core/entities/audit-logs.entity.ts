@@ -21,4 +21,10 @@ export class AuditLogEntity {
 
     @Column({name: "date", type: "timestamp", default: () => "CURRENT_TIMESTAMP", nullable: false})
     date!: Date;
+
+    @Column({name: "description", type: "varchar", length: 250})
+    description!: string;
+
+    @Column({name: "success", type: "boolean", default: false})
+    success!: boolean;
 } 

@@ -27,7 +27,7 @@ export class DashboardService {
                     return {
                         userName: u.userName,
                         email: u.email,
-                        risk: `${u.audit.filter(l => l.action == "LOGIN_FAIL").length * 5}%`,
+                        risk: `${u.audit.filter(l => l.action == "LOGIN_FAIL").length * 5}`,
                         status: u.status
                     } as ActiveUser
                 }
@@ -95,6 +95,8 @@ export class DashboardService {
                         user: l.user.userName,
                         action: l.action,
                         ip: l.ip,
+                        description: l.description,
+                        success: l.success,
                         date: new Date(l.date)
                     } as LastLogs
                 }),

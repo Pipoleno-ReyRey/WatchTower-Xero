@@ -98,21 +98,25 @@ export class UserService {
     try {
 
       let blackIps: BlackListEntity[] = await this.blackListRepo.find();
-      if(blackIps.filter(i => i.ip == ip).length > 0){
-        let audit: AuditLogEntity = new AuditLogEntity();
-          audit.action = "BLOCK_IP_LOGIN_TRY";
-          audit.ip = ip;
 
-          await this.auditRepo.save(audit);
-          return null;
-      }
-      
       let login: UserEntity | null = await this.userRepository
         .createQueryBuilder("uu")
         .innerJoinAndSelect("uu.roles", "roles")
         .where("uu.user_name = :userName", { userName: user.user })
         .orWhere("uu.email = :email", { email: user.email })
         .getOne();
+
+      if(blackIps.filter(i => i.ip == ip).length > 0){
+        let audit: AuditLogEntity = new AuditLogEntity();
+          audit.action = "BLOCK_IP_LOGIN_TRY";
+          audit.ip = ip;
+          audit.user = login!;
+          audit.description = "Inicio de sesion con IP bloqueada";
+          audit.success = false;
+
+          await this.auditRepo.save(audit);
+          return null;
+      }
 
       let crypt = await bcrypt.hash(user.password, 10);
 
@@ -139,6 +143,8 @@ export class UserService {
           audit.action = "LOGIN_SUCCEEDED";
           audit.ip = ip;
           audit.user = login;
+          audit.description = "Inicio de sesion";
+          audit.success = true;
 
           await this.auditRepo.save(audit);
           let response = {
@@ -159,6 +165,8 @@ export class UserService {
           audit.action = "LOGIN_FAILED";
           audit.ip = ip;
           audit.user = login;
+          audit.description = "Inicio de sesion";
+          audit.success = false;
 
           await this.auditRepo.save(audit);
           return null;

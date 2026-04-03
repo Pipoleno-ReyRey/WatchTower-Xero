@@ -18,8 +18,10 @@ export class ActiveUser{
 export class LastLogs{
     user!: string;
     action!: string;
+    description!: string;
     ip!: string;
     date!: Date;
+    success!: boolean;
 }
 
 export class Roles{
