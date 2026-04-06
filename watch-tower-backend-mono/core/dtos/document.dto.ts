@@ -17,3 +17,10 @@ export class createDocDTO{
     hasPass!: boolean;
     pass?: string | null;
 }
+
+export class updateDocDTO{
+    title!: string;
+    content!: string;
+    hassPass?: boolean;
+    pass?: string | null;
+}

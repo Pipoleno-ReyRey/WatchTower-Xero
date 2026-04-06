@@ -81,6 +81,8 @@ export class UserService {
       audit.action = "CREATED_USER";
       audit.ip = ip;
       audit.user = newUser;
+      audit.description = "Creacion de usuario",
+        audit.success = true;
 
       await this.auditRepo.save(audit);
       return {
@@ -98,21 +100,25 @@ export class UserService {
     try {
 
       let blackIps: BlackListEntity[] = await this.blackListRepo.find();
-      if(blackIps.filter(i => i.ip == ip).length > 0){
-        let audit: AuditLogEntity = new AuditLogEntity();
-          audit.action = "BLOCK_IP_LOGIN_TRY";
-          audit.ip = ip;
 
-          await this.auditRepo.save(audit);
-          return null;
-      }
-      
       let login: UserEntity | null = await this.userRepository
         .createQueryBuilder("uu")
         .innerJoinAndSelect("uu.roles", "roles")
         .where("uu.user_name = :userName", { userName: user.user })
         .orWhere("uu.email = :email", { email: user.email })
         .getOne();
+
+      if (blackIps.filter(i => i.ip == ip).length > 0) {
+        let audit: AuditLogEntity = new AuditLogEntity();
+        audit.action = "BLOCK_IP_LOGIN_TRY";
+        audit.ip = ip;
+        audit.user = login!;
+        audit.description = "Inicio de sesion con IP bloqueada";
+        audit.success = false;
+
+        await this.auditRepo.save(audit);
+        return null;
+      }
 
       let crypt = await bcrypt.hash(user.password, 10);
 
@@ -139,6 +145,8 @@ export class UserService {
           audit.action = "LOGIN_SUCCEEDED";
           audit.ip = ip;
           audit.user = login;
+          audit.description = "Inicio de sesion";
+          audit.success = true;
 
           await this.auditRepo.save(audit);
           let response = {
@@ -159,16 +167,13 @@ export class UserService {
           audit.action = "LOGIN_FAILED";
           audit.ip = ip;
           audit.user = login;
+          audit.description = "Inicio de sesion";
+          audit.success = false;
 
           await this.auditRepo.save(audit);
           return null;
         }
       } else {
-        let audit: AuditLogEntity = new AuditLogEntity();
-        audit.action = "LOGIN_FAILED";
-        audit.ip = ip;
-
-        await this.auditRepo.save(audit);
         return null;
       }
     } catch (error: any) {
@@ -359,28 +364,30 @@ export class UserService {
     }
   }
 
-  async update(user: UpdateUser) {
+  async update(user: UpdateUser, ip: string) {
     try {
-      let dbUser = await this.userRepository.findOne({where:{id: user.id}});
+      let dbUser = await this.userRepository.findOne({ where: { id: user.id } });
 
       let userRole: RoleUserEntity = new RoleUserEntity();
-      userRole.user = dbUser!.userName;
       userRole.role = user.rol.id!;
-
-      let audits = await this.auditRepo
-        .createQueryBuilder()
-        .select()
-        .where("user = :user", { user: dbUser!.userName })
-        .getMany();
 
       dbUser!.name = user.name;
       dbUser!.userName = user.userName;
       dbUser!.email = user.email;
       dbUser!.password = await bcrypt.hash(user.password, 10);
       dbUser!.pin = user.pin;
-      
+
       await this.userRepository.save(dbUser!);
-      
+
+      let audit: AuditLogEntity = new AuditLogEntity();
+      audit.action = "UPDATED_USER";
+      audit.ip = ip;
+      audit.user = dbUser!;
+      audit.description = "Actualizacion de usuario";
+      audit.success = true;
+
+      await this.auditRepo.save(audit);
+
     } catch (error: any) {
       throw new HttpException(error.message, 500);
     }
