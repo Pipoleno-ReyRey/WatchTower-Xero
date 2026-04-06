@@ -2,15 +2,17 @@ import { RoleCard } from "../components/roles/RoleCard";
 import { Button } from "../components/ui/button";
 import { Plus } from "lucide-react";
 import { useRoles } from "../hooks/useRoles";
+import { RoleForm } from "../components/roles/RoleForm";
+import { useState } from "react";
 
 export const RolePage = () => {
   const { data } = useRoles();
+  const [open, setOpen] = useState(true);
   return (
     <div className="w-full space-y-3">
       <div className="py-4 flex justify-between items-center">
         <h2 className="font-bold text-2xl">Gestión de roles</h2>
-        <Button>
-          {/* <Button onClick={openCreate}> */}
+        <Button onClick={() => setOpen(true)}>
           <Plus />
           Nuevo rol
         </Button>
@@ -19,11 +21,9 @@ export const RolePage = () => {
         {data?.map((r) => (
           <RoleCard key={r.id} role={r} />
         ))}
-        {/* <RoleCard />
-        <RoleCard />
-        <RoleCard />
-        <RoleCard /> */}
       </div>
+
+      {open && <RoleForm isOpen={open} onOpenChange={setOpen} />}
     </div>
   );
 };
