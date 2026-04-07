@@ -38,32 +38,48 @@ export class UserController {
 
   @Get("user/all")
   @UseGuards(AuthGuard)
-  async all(){
-    return await this.userService.getAllUsers();
+  async all(@Req() req) {
+    if(req.info.role[0].id == 3 || req.info.role[0].id == 1){
+      return await this.userService.getAllUsers();
+    } else {
+      throw new UnauthorizedException();
+    }
   }
 
   @Get("/roles/all")
   @UseGuards(AuthGuard)
-  async allRoles(): Promise<RoleEntity[]>{
-    return await this.userService.getAllRoles();
+  async allRoles(@Req() req): Promise<RoleEntity[]>{
+    if(req.info.role[0].id == 3 || req.info.role[0].id == 1){
+      return await this.userService.getAllRoles();
+    } else {
+      throw new UnauthorizedException();
+    }
   }
 
   @Post("role")
   @UseGuards(AuthGuard)
-  async postRole(@Body() role: roleDto){
-    return await this.userService.createRole(role);
+  async postRole(@Body() role: roleDto, @Req() req){
+    if(req.info.role[0].id == 1){
+      return await this.userService.createRole(role);
+    } else {
+      throw new UnauthorizedException();
+    }
   }
 
   @Get("user/get/:id")
   @UseGuards(AuthGuard)
-  async getUser(@Param("id") id: number){
-    return await this.userService.getUserId(id);
+  async getUser(@Param("id") id: number, @Req() req){
+    if(req.info.role[0].id == 1){
+      return await this.userService.getUserId(id);
+    } else {
+      throw new UnauthorizedException();
+    }
   }
 
   @Patch("user/update")
   @UseGuards(AuthGuard)
   async patchUser(@Body() user: UpdateUser, @Req() req){
-    if(req.info.role[0].role == "admin"){
+    if(req.info.role[0].id == 1){
       return await this.userService.update(user, req.ip);
     } else {
       throw new UnauthorizedException();
