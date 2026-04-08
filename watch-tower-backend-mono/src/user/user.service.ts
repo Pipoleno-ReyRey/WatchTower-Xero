@@ -393,4 +393,37 @@ export class UserService {
     }
 
   }
+
+  async deleteUser(id: number, admin: string, ip: string){
+
+    try {
+      let user: UserEntity | null = await this.userRepository.findOne({ where: {id: id}});
+      let userAdmin: UserEntity | null = await this.userRepository.findOne({ where: {userName: admin}});
+
+      if(user){
+        await this.userRepository.delete({id: id});
+
+        let log: AuditLogEntity = new AuditLogEntity();
+        log.action = "DELETE_USER";
+        log.user = userAdmin!;
+        log.description = `se elimino al usuario ${user.userName} por el admin ${userAdmin?.userName}`;
+        log.ip = ip;
+        log.success = true;
+
+        await this.auditRepo.save(log);
+
+      } else {
+        let log: AuditLogEntity = new AuditLogEntity();
+        log.action = "DELETE_USER_FAILED";
+        log.user = userAdmin!;
+        log.description = `usuario no encontrado para eliminar`;
+        log.ip = ip;
+        log.success = false;
+
+        await this.auditRepo.save(log);
+      }
+    } catch (error: any) {
+      throw new HttpException(error.message, 500);
+    }
+  }
 }

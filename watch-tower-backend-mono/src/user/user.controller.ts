@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Patch, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Patch, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { LoginDto } from 'core/dtos/login.dto';
 import { signIn } from 'core/dtos/sign.dto';
 import { AuthGuard } from 'core/guards/auth.guard';
@@ -83,6 +83,16 @@ export class UserController {
       return await this.userService.update(user, req.ip);
     } else {
       throw new UnauthorizedException();
+    }
+  }
+  
+  @Delete("user/:id")
+  @UseGuards(AuthGuard)
+  async deleteUser(@Param("id") id: number, @Req() req){
+    if(req.info.role[0].id == 1){
+      await this.userService.deleteUser(id, req.info.userName, req.ip);
+    } else {
+      throw new UnauthorizedException("not authored user to this action");
     }
   }
 }
