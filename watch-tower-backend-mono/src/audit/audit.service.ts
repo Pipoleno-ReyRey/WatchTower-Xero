@@ -25,7 +25,9 @@ export class AuditService {
                     userName: log.user.userName,
                     action: log.action,
                     ip: log.ip,
-                    date: log.date
+                    date: log.date,
+                    description: log.description,
+                    success: log.success
                 };
             });
 

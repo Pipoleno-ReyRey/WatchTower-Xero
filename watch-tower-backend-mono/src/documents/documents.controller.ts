@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { DocumentsService } from './documents.service';
 import { AuthGuard } from 'core/guards/auth.guard';
 import { createDocDTO, documentDto, updateDocDTO } from 'core/dtos/document.dto';
@@ -28,5 +28,10 @@ export class DocumentsController {
   @Put("update/:id")
   async updateDoc(@Body() doc: updateDocDTO, @Req() req, @Param("id") id: number){
     return await this.documentsService.updateDoc(doc, req.info, req.ip, id);
+  }
+
+  @Delete("doc/:id")
+  async deleteDoc(@Param("id") id: number, @Req() req){
+    
   }
 }

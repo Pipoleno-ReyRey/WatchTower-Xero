@@ -180,5 +180,14 @@ export class DocumentsService {
     }
   }
 
+  async deleteDoc(id: number, ip: string){
+    try {
+      let doc: DocumentEntity | null = await this.docRepo.findOne({where: {id: id}});
+      
+    } catch (error: any) {
+      throw new HttpException(error.message, 500);
+    }
+  }
+
 }
 
