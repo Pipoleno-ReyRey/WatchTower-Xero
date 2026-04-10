@@ -1,23 +1,25 @@
 import type { Role } from "../schemas/role";
 import type { StateCreator } from "zustand";
-import { getAllRoles } from "../services/roles-services";
 
 export interface RoleState {
-  roles: Role[];
-  getRoles: () => Promise<void>;
+  openModalRole: boolean;
+  setOpenModalRole: (state: boolean) => void;
+  role: Role | null;
+  setRole: (role: Role | null) => void;
 }
 
 export const RoleSlice: StateCreator<RoleState> = (set) => ({
-  roles: [],
-  getRoles: async () => {
-    try {
-      const res = await getAllRoles();
-
-      set(() => ({
-        roles: [...res],
-      }));
-    } catch (error) {
-      console.log(error);
-    }
+  role: null,
+  openModalRole: false,
+  setOpenModalRole(state) {
+    set(() => ({
+      openModalRole: state,
+      
+    }));
+  },
+  setRole(role) {
+    set(() => ({
+      role: role,
+    }));
   },
 });

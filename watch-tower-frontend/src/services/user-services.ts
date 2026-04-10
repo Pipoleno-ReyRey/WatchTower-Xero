@@ -1,5 +1,10 @@
 import { axiosClient } from "../lib/axios";
-import type { IUser, IUserForm } from "../schemas/user";
+import type {
+  IUser,
+  IUserForm,
+  IUserResponse,
+  // UpdateUserForm,
+} from "../schemas/user";
 
 export const getAllUsers = async () => {
   const res = await axiosClient<IUser[]>("/user/all");
@@ -8,4 +13,14 @@ export const getAllUsers = async () => {
 
 export const createuser = async (user: IUserForm) => {
   return await axiosClient.post<IUserForm>("/sign-in", user);
+};
+
+export const getUserById = async (id: number) => {
+  const res = await axiosClient<IUserResponse>(`/user/get/${id}`);
+  return res.data;
+};
+
+export const updateUser = async (user: IUserResponse) => {
+  const res = await axiosClient.patch<IUserResponse>(`/user/update/`, user);
+  return res.data;
 };

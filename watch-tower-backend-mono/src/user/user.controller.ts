@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Patch, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Patch, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { LoginDto } from 'core/dtos/login.dto';
 import { signIn } from 'core/dtos/sign.dto';
 import { AuthGuard } from 'core/guards/auth.guard';
@@ -68,7 +68,7 @@ export class UserController {
 
   @Get("user/get/:id")
   @UseGuards(AuthGuard)
-  async getUser(@Param("id") id: number, @Req() req){
+  async getUser(@Param("id", ParseIntPipe) id: number, @Req() req){
     if(req.info.role[0].id == 1){
       return await this.userService.getUserId(id);
     } else {

@@ -10,9 +10,10 @@ import { DocumentPage } from "../pages/Document/DocumentPage";
 import { CreateDocumentPage } from "../pages/Document/CreateDocumentPage";
 import { DocumentDetailPage } from "../pages/Document/DocumentDetailsPage";
 import { RolePage } from "../pages/RolePage";
-import { UserForm } from "../components/user/UserForm";
+
 // import { NotFoundPage } from "../pages/NotFoundPage";
 import { AuditPage } from "../pages/AuditPage";
+import { UserFormPage } from "../pages/User/UserFormPage";
 
 export const routes = createBrowserRouter([
   {
@@ -38,8 +39,14 @@ export const routes = createBrowserRouter([
                 index: true,
                 element: <UserPage />,
               },
-              { path: "create", element: <UserForm /> },
-              { path: ":id", element: <UserForm /> },
+              {
+                path: "create",
+                element: <UserFormPage />,
+              },
+              {
+                path: ":id",
+                element: <UserFormPage />,
+              },
             ],
           },
           {

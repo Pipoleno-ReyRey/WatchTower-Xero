@@ -14,11 +14,11 @@ export class UserDto{
 }
 
 export class UpdateUser{
-    id!: number;
+    id?: number;
     name!: string;
     userName!: string;
     email!: string;
-    password!: string;
-    rol!: roleDto;
+    // password!: string;
+    role!: roleDto;
     pin!: string;
 }
