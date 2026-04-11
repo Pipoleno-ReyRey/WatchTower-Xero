@@ -30,8 +30,8 @@ export class DocumentsController {
     return await this.documentsService.updateDoc(doc, req.info, req.ip, id);
   }
 
-  @Delete("doc/:id")
+  @Delete("delete/:id")
   async deleteDoc(@Param("id") id: number, @Req() req){
-    
+    return await this.documentsService.deleteDoc(id, req.ip, req.info);
   }
 }

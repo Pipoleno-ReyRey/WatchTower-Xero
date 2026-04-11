@@ -180,11 +180,37 @@ export class DocumentsService {
     }
   }
 
-  async deleteDoc(id: number, ip: string){
+  async deleteDoc(id: number, ip: string, user: any){
+    let u: UserEntity | null = await this.userRepo.findOne({ where: {userName: user.userName}});
+    console.log(user);
+
     try {
       let doc: DocumentEntity | null = await this.docRepo.findOne({where: {id: id}});
+
+      if(doc && (doc.user == u || user?.role[0].id == 1)){
+
+        let audit: AuditLogEntity = new AuditLogEntity();
+        audit.action = "DELETE_DOCUMENT";
+        audit.ip = ip;
+        audit.description = "Eliminacion de documento";
+        audit.user = u!;
+        audit.success = true;
+
+        await this.auditRepo.save(audit);
+        await this.docRepo.delete({id: doc.id});
+      } else {
+        throw new UnauthorizedException();
+      }
       
     } catch (error: any) {
+      let audit: AuditLogEntity = new AuditLogEntity();
+      audit.action = "DELETE_DOCUMENT_FAILED";
+      audit.ip = ip;
+      audit.description = "Eliminacion de documento";
+      audit.success = false;
+      audit.user = u!;
+
+      await this.auditRepo.save(audit);
       throw new HttpException(error.message, 500);
     }
   }
