@@ -10,7 +10,7 @@ const mapUserToForm = (user: IUserResponse) => ({
   userName: user.userName,
   email: user.email,
   pin: user.pin,
-  roles: user.role ? [user.role] : [],
+  role: user.role ? [user.role] : [],
 });
 
 export const UserFormPage = () => {
@@ -23,6 +23,10 @@ export const UserFormPage = () => {
 
   if (userId && isError) {
     return <p>Error cargando el usuario</p>;
+  }
+
+  if (userId && !data) {
+    return null;
   }
 
   const mappedUser = data ? mapUserToForm(data) : null;

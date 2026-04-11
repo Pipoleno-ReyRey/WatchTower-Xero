@@ -1,4 +1,4 @@
-import { UserRoundCog } from "lucide-react";
+import { PencilLineIcon, Trash2Icon, UserRoundCog } from "lucide-react";
 import { useState } from "react";
 import type { IUser } from "../../schemas/user";
 
@@ -20,6 +20,15 @@ import {
   PaginationPrevious,
 } from "../ui/pagination";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -32,15 +41,11 @@ export const UserTable = ({ users }: Props) => {
 
   const [page, setPage] = useState(1);
   const pageSize = 10;
-
   const totalPages = Math.ceil(users.length / pageSize);
-
   const paginatedData = users.slice((page - 1) * pageSize, page * pageSize);
-  console.log(users[0]);
 
   return (
     <div className="w-full space-y-4">
-      {/* TABLE */}
       <div className="[&>div]:rounded-sm [&>div]:border">
         <Table>
           <TableHeader>
@@ -60,18 +65,34 @@ export const UserTable = ({ users }: Props) => {
 
                 <TableCell>{item.email}</TableCell>
 
-                <TableCell>{item.roles?.role ?? "Sin rol"}</TableCell>
+                <TableCell>{item.role[0].role ?? "Sin rol"}</TableCell>
 
                 <TableCell>{item.status ? "Activo" : "Bloqueado"}</TableCell>
 
                 <TableCell>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => navigate(`${item.id}`)}
-                  >
-                    <UserRoundCog size={18} />
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size={"sm"}>
+                        <UserRoundCog size={18} />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-34">
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem
+                          onClick={() => navigate(`${item.id}`)}
+                        >
+                          <PencilLineIcon />
+                          Editar
+                        </DropdownMenuItem>
+
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem variant="destructive">
+                          <Trash2Icon />
+                          <span>Borrar</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))}

@@ -14,7 +14,7 @@ export const userCreateSchema = z.object({
 
   email: z.string().email("Debe ser un email válido"),
 
-  roles: z.array(roleSchema).min(1),
+  role: z.array(roleSchema).min(1),
 
   password: z
     .string("contrase;a requerida")

@@ -33,7 +33,7 @@ interface Props {
     userName: string;
     email: string;
     pin: string;
-    roles: { id: number; role: string }[];
+    role: { id: number; role: string }[];
   } | null;
 }
 
@@ -53,7 +53,7 @@ export const UserForm = ({ user }: Props) => {
       userName: "",
       email: "",
       password: "",
-      roles: [],
+      role: [],
       pin: "",
     },
   });
@@ -66,7 +66,7 @@ export const UserForm = ({ user }: Props) => {
         email: user.email,
         password: "",
         pin: user.pin || "",
-        roles: user.roles,
+        role: user.role,
       });
       form.trigger();
     }
@@ -82,7 +82,7 @@ export const UserForm = ({ user }: Props) => {
           email: data.email,
           pin: data.pin,
 
-          role: data.roles[0], // 🔥 AQUÍ ESTÁ TODO EL FIX
+          role: data.role[0], // 🔥 AQUÍ ESTÁ TODO EL FIX
         });
       } else {
         await createUserMutation.mutateAsync(data as IUserForm);
@@ -199,7 +199,7 @@ export const UserForm = ({ user }: Props) => {
 
           {/* rol */}
           <Controller
-            name="roles"
+            name="role"
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>

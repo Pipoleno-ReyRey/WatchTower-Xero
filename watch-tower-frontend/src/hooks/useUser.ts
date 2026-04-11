@@ -1,4 +1,8 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  type UseQueryOptions,
+} from "@tanstack/react-query";
 import {
   createuser,
   getAllUsers,
@@ -19,11 +23,18 @@ export const useUser = () => {
     refetchInterval: 1000 * 60 * 5,
   });
 
-  const useUserByIdQuery = (id: number) =>
+  const useUserByIdQuery = (
+    id: number,
+    options?: UseQueryOptions<IUserResponse, Error>,
+  ) =>
     useQuery({
       queryKey: ["user"],
       queryFn: () => getUserById(id),
       refetchOnWindowFocus: false,
+      enabled: !!id,
+      staleTime: 0,
+      gcTime: 0,
+      ...options,
     });
 
   const createUserMutation = useMutation({
