@@ -31,7 +31,7 @@ import { useRoles } from "../../hooks/useRoles";
 
 export const UserPage = () => {
   const { userQuery } = useUser();
-  const { data: roles } = useRoles();
+  const { roleQuery } = useRoles();
   const { filteredData, search, setSearch, setFilter } = useSearch(
     userQuery.data,
   );
@@ -83,15 +83,9 @@ export const UserPage = () => {
             <div className="flex gap-2 items-center lg:col-span-1">
               <Filter size={30} className="hidden lg:block" />
 
-              {/* <CustomSelect
-                placeholder="Roles"
-                options={roles ?? []}
-                className="lg:w-44"
-                onValueChange={(value) => setFilter("role", value)}
-              /> */}
               <CustomSelect
                 placeholder="Roles"
-                options={(roles ?? []).map((r) => ({
+                options={(roleQuery.data ?? []).map((r) => ({
                   label: r.role,
                   value: r.id.toString(),
                 }))}

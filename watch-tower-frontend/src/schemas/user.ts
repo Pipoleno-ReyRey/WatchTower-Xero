@@ -14,14 +14,11 @@ export const userCreateSchema = z.object({
 
   email: z.string().email("Debe ser un email válido"),
 
-  roles: z.array(roleSchema).min(1),
-
-  // status: z.boolean(),
+  role: z.array(roleSchema).min(1),
 
   password: z
     .string("contrase;a requerida")
     .min(6, "El PIN debe tener mínimo 6 dígitos"),
-  // status: z.boolean().default(true),
 
   pin: z
     .string()
@@ -42,6 +39,27 @@ export const userSchema = userCreateSchema
       .min(1)
       .transform((roles) => roles[0]),
   });
+export const userUpdateSchema = userCreateSchema
+  .omit({ password: true })
+  // .extend({
+  //   id: z.number(),
+  //   // password: z.string().min(6).optional(),
+  // });
 
+export const userResponseSchema = z.object({
+  id: z.number(),
+
+  name: z.string(),
+  userName: z.string(),
+  email: z.email(),
+
+  role: roleSchema,
+  pin: z.string(),
+  status: z.boolean().optional(),
+  risk: z.string().optional(),
+});
+
+export type UpdateUserForm = z.infer<typeof userUpdateSchema>;
 export type IUserForm = z.infer<typeof userCreateSchema>;
 export type IUser = z.infer<typeof userSchema>;
+export type IUserResponse = z.infer<typeof userResponseSchema>;

@@ -1,12 +1,18 @@
-import { useState } from "react";
+// este componente fue hecho por ia
+import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
 
 import { ArrowLeft, Save, Lock, Eye } from "lucide-react";
 
-import { userCreateSchema, type IUserForm } from "../../schemas/user";
-// import { useStore } from "../../store/appStore";
+import {
+  userCreateSchema,
+  userUpdateSchema,
+  type IUserForm,
+  type UpdateUserForm,
+} from "../../schemas/user";
+
 import { useRoles } from "../../hooks/useRoles";
 import { useUser } from "../../hooks/useUser";
 
@@ -21,36 +27,73 @@ import { Input } from "../../components/ui/input";
 import { CustomSelect } from "../../components/form/CustomSelect";
 
 interface Props {
-  user?: IUserForm;
+  user: {
+    id: number;
+    name: string;
+    userName: string;
+    email: string;
+    pin: string;
+    role: { id: number; role: string }[];
+  } | null;
 }
+
 export const UserForm = ({ user }: Props) => {
-  const { data: roles } = useRoles();
-  const { createUserMutation } = useUser();
+  const { roleQuery } = useRoles();
+  const { createUserMutation, updateUserMutation } = useUser();
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const form = useForm<IUserForm>({
-    resolver: zodResolver(userCreateSchema),
+  const isEdit = !!user;
+
+  const form = useForm<IUserForm | UpdateUserForm>({
+    resolver: zodResolver(isEdit ? userUpdateSchema : userCreateSchema),
     mode: "onChange",
     defaultValues: {
       name: "",
       userName: "",
       email: "",
       password: "",
-      roles: [],
+      role: [],
       pin: "",
     },
   });
 
-  async function onSubmit(data: IUserForm) {
+  useEffect(() => {
+    if (user) {
+      form.reset({
+        name: user.name,
+        userName: user.userName,
+        email: user.email,
+        password: "",
+        pin: user.pin || "",
+        role: user.role,
+      });
+      form.trigger();
+    }
+  }, [user, form]);
+
+  async function onSubmit(data: IUserForm | UpdateUserForm) {
     try {
-      await createUserMutation.mutateAsync(data);
+      if (isEdit && user?.id) {
+        await updateUserMutation.mutateAsync({
+          id: user.id,
+          name: data.name,
+          userName: data.userName,
+          email: data.email,
+          pin: data.pin,
+
+          role: data.role[0], // 🔥 AQUÍ ESTÁ TODO EL FIX
+        });
+      } else {
+        await createUserMutation.mutateAsync(data as IUserForm);
+      }
     } catch (error) {
-      console.error("Error:", error);
+      console.error(error);
     }
   }
 
-  const isLoading = createUserMutation.isPending;
+  const isLoading =
+    createUserMutation.isPending || updateUserMutation.isPending;
 
   return (
     <div className="flex flex-col gap-4">
@@ -64,15 +107,15 @@ export const UserForm = ({ user }: Props) => {
 
       {/* title */}
       <h1 className="text-xl font-semibold">
-        {"Crear usuario"}
-        {/* {  "Editar usuario" : "Crear usuario"} */}
+        {isEdit ? "Editar usuario" : "Crear usuario"}
       </h1>
 
-      {/* card */}
+      {/* form */}
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col gap-4 rounded-lg border bg-card p-4 md:p-6"
       >
+        {/* <p> {JSON.stringify(form.formState.errors)}</p> */}
         <FieldGroup>
           {/* nombre */}
           <Controller
@@ -81,9 +124,7 @@ export const UserForm = ({ user }: Props) => {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel>Nombre</FieldLabel>
-
-                <Input {...field} placeholder="Pedro Duarte" />
-
+                <Input {...field} />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
@@ -98,9 +139,7 @@ export const UserForm = ({ user }: Props) => {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel>Nombre de usuario</FieldLabel>
-
-                <Input {...field} placeholder="pduarte" />
-
+                <Input {...field} />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
@@ -115,9 +154,7 @@ export const UserForm = ({ user }: Props) => {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel>Email</FieldLabel>
-
                 <Input {...field} type="email" />
-
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
@@ -125,58 +162,59 @@ export const UserForm = ({ user }: Props) => {
             )}
           />
 
-          {/* password */}
-          <Controller
-            name="password"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Contraseña {"*"}</FieldLabel>
+          {/* password SOLO EN CREATE */}
+          {!isEdit && (
+            <Controller
+              name="password"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel>Contraseña *</FieldLabel>
 
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 
-                  <Input
-                    {...field}
-                    type={showPassword ? "text" : "password"}
-                    className="pl-10 pr-10"
-                  />
+                    <Input
+                      {...field}
+                      type={showPassword ? "text" : "password"}
+                      className="pl-10 pr-10"
+                    />
 
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2"
-                  >
-                    <Eye className="h-4 w-4" />
-                  </button>
-                </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </button>
+                  </div>
 
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          )}
 
           {/* rol */}
           <Controller
-            name="roles"
+            name="role"
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel>Rol</FieldLabel>
 
                 <CustomSelect
-                  options={(roles ?? []).map((r) => ({
+                  options={(roleQuery.data ?? []).map((r) => ({
                     label: r.role,
                     value: r.id.toString(),
                   }))}
                   value={field.value?.[0]?.id?.toString() ?? ""}
                   onValueChange={(value) => {
-                    const selected = roles?.find(
+                    const selected = roleQuery.data?.find(
                       (r) => r.id.toString() === value,
                     );
-
                     if (selected) field.onChange([selected]);
                   }}
                 />
@@ -195,14 +233,7 @@ export const UserForm = ({ user }: Props) => {
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel>PIN</FieldLabel>
-
-                <Input
-                  {...field}
-                  maxLength={6}
-                  inputMode="numeric"
-                  placeholder="123456"
-                />
-
+                <Input {...field} maxLength={6} inputMode="numeric" />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
@@ -214,15 +245,14 @@ export const UserForm = ({ user }: Props) => {
         {/* footer */}
         <div className="flex justify-end gap-2 pt-2">
           <Link to={".."}>
-            <Button variant="outline" type="button">
+            <Button type="button" variant="outline">
               Cancelar
             </Button>
           </Link>
 
-          <Button type="submit" disabled={!form.formState.isValid || isLoading}>
+          <Button type="submit" disabled={isLoading || !form.formState.isValid}>
             <Save className="mr-2 h-4 w-4" />
-            {/* {isLoading ? "Guardando..." : selectedUser ? "Actualizar" : "Crear"} */}
-            {"Crear"}
+            {isLoading ? "Guardando..." : isEdit ? "Actualizar" : "Crear"}
           </Button>
         </div>
       </form>

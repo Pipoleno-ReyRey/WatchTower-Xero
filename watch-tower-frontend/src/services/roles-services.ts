@@ -1,5 +1,5 @@
 import { axiosClient } from "../lib/axios";
-import type { Role, UserRole } from "../schemas/role";
+import type { CreateRole, Role, UserRole } from "../schemas/role";
 
 export const getAllRoles = async () => {
   const res = await axiosClient.get<Role[]>("/roles/all");
@@ -10,5 +10,10 @@ export const getAllRoles = async () => {
 export const getRoles = async () => {
   const res = await axiosClient.get<UserRole[]>("/roles/all");
 
+  return res.data;
+};
+
+export const createRole = async (data: CreateRole) => {
+  const res = await axiosClient.post("/role", data);
   return res.data;
 };

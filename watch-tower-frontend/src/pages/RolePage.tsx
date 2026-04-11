@@ -3,27 +3,44 @@ import { Button } from "../components/ui/button";
 import { Plus } from "lucide-react";
 import { useRoles } from "../hooks/useRoles";
 import { RoleForm } from "../components/roles/RoleForm";
-import { useState } from "react";
+
+import { useStore } from "../store/appStore";
 
 export const RolePage = () => {
-  const { data } = useRoles();
-  const [open, setOpen] = useState(true);
+  const { roleQuery } = useRoles();
+
+  const role = useStore((state) => state.role);
+  const setOpenModalRole = useStore((state) => state.setOpenModalRole);
+  const setRole = useStore((state) => state.setRole);
+  const openModalRole = useStore((state) => state.openModalRole);
+
   return (
     <div className="w-full space-y-3">
       <div className="py-4 flex justify-between items-center">
         <h2 className="font-bold text-2xl">Gestión de roles</h2>
-        <Button onClick={() => setOpen(true)}>
+        <Button
+          onClick={() => {
+            setRole(null);
+            setOpenModalRole(true);
+          }}
+        >
           <Plus />
           Nuevo rol
         </Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {data?.map((r) => (
+        {roleQuery.data?.map((r) => (
           <RoleCard key={r.id} role={r} />
         ))}
       </div>
 
-      {open && <RoleForm isOpen={open} onOpenChange={setOpen} />}
+      {openModalRole && (
+        <RoleForm
+          data={role}
+          isOpen={openModalRole}
+          onOpenChange={setOpenModalRole}
+        />
+      )}
     </div>
   );
 };

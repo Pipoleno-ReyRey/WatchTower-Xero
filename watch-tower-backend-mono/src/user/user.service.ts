@@ -366,15 +366,16 @@ export class UserService {
 
   async update(user: UpdateUser, ip: string) {
     try {
+      console.log(user)
       let dbUser = await this.userRepository.findOne({ where: { id: user.id } });
 
       let userRole: RoleUserEntity = new RoleUserEntity();
-      userRole.role = user.rol.id!;
+      userRole.role = user.role.id!;
 
       dbUser!.name = user.name;
       dbUser!.userName = user.userName;
       dbUser!.email = user.email;
-      dbUser!.password = await bcrypt.hash(user.password, 10);
+      // dbUser!.password = await bcrypt.hash(user.password, 10);
       dbUser!.pin = user.pin;
 
       await this.userRepository.save(dbUser!);
