@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Patch, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Patch, Post, Put, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { LoginDto } from 'core/dtos/login.dto';
 import { signIn } from 'core/dtos/sign.dto';
 import { AuthGuard } from 'core/guards/auth.guard';
@@ -46,26 +46,6 @@ export class UserController {
     }
   }
 
-  @Get("/roles/all")
-  @UseGuards(AuthGuard)
-  async allRoles(@Req() req): Promise<RoleEntity[]>{
-    if(req.info.role[0].id == 3 || req.info.role[0].id == 1){
-      return await this.userService.getAllRoles();
-    } else {
-      throw new UnauthorizedException();
-    }
-  }
-
-  @Post("role")
-  @UseGuards(AuthGuard)
-  async postRole(@Body() role: roleDto, @Req() req){
-    if(req.info.role[0].id == 1){
-      return await this.userService.createRole(role);
-    } else {
-      throw new UnauthorizedException();
-    }
-  }
-
   @Get("user/get/:id")
   @UseGuards(AuthGuard)
   async getUser(@Param("id", ParseIntPipe) id: number, @Req() req){
@@ -92,7 +72,48 @@ export class UserController {
     if(req.info.role[0].id == 1){
       await this.userService.deleteUser(id, req.info.userName, req.ip);
     } else {
+      throw new UnauthorizedException("not  authored user to this action");
+    }
+  }
+
+  @Put("user/block/:id")
+  @UseGuards(AuthGuard)
+  async blockUser(@Param("id") id: number, @Req() req){
+    if(req.info.role[0].id == 1){
+      await this.userService.blockUser(id, req.info.userName, req.ip);
+    } else {
       throw new UnauthorizedException("not authored user to this action");
     }
   }
+
+  @Get("/roles/all")
+  @UseGuards(AuthGuard)
+  async allRoles(@Req() req): Promise<RoleEntity[]>{
+    if(req.info.role[0].id == 3 || req.info.role[0].id == 1){
+      return await this.userService.getAllRoles();
+    } else {
+      throw new UnauthorizedException();
+    }
+  }
+
+  @Post("role")
+  @UseGuards(AuthGuard)
+  async postRole(@Body() role: roleDto, @Req() req){
+    if(req.info.role[0].id == 1){
+      return await this.userService.createRole(role);
+    } else {
+      throw new UnauthorizedException();
+    }
+  }
+
+  @Put("role/:id")
+  @UseGuards(AuthGuard)
+  async updateRole(@Body() role: roleDto, @Param("id") id: number, @Req() req){
+    if(req.info.role[0].id == 1){
+      return await this.userService.updateRole(id, role, req.ip, req.info.userName);
+    } else {
+      throw new UnauthorizedException();
+    }
+  }
+  
 }

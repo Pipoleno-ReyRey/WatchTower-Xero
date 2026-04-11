@@ -18,7 +18,7 @@ export class UpdateUser{
     name!: string;
     userName!: string;
     email!: string;
-    // password!: string;
+    password!: string;
     role!: roleDto;
     pin!: string;
 }
