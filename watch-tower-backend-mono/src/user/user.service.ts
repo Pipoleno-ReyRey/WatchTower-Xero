@@ -120,8 +120,6 @@ export class UserService {
         return null;
       }
 
-      let crypt = await bcrypt.hash(user.password, 10);
-
       if (login) {
         let roles: roleDto[] = (await this.roleRepository
           .createQueryBuilder()
@@ -200,25 +198,6 @@ export class UserService {
     }
   }
 
-  private async createSession(
-    logs: LoginDto,
-    user: UserEntity,
-    action: string,
-  ) {
-    try {
-      let session: SessionEntity = {
-        ipAddress: logs.session!.ip,
-        action: action,
-        status: true,
-        user: user,
-      } as SessionEntity;
-
-      return await this.sessionRepository.save(session);
-    } catch (error: any) {
-      throw new HttpException(error.message, 500);
-    }
-  }
-
   async getAllUsers(): Promise<UserDto[] | undefined> {
     try {
       let users: UserEntity[] | null = await this.userRepository
@@ -236,49 +215,32 @@ export class UserService {
         return;
       }
 
-      let response: UserDto[] = users.map((user) => {
-        let risk =
-          user.audit.filter((audit) => audit.action == "LOGIN_FAILED").length *
-          5;
+      if (users && roles) {
+        let response: UserDto[] = users.map((user) => {
+          let risk = user.audit.filter((audit) => audit.action == "LOGIN_FAILED").length * 5;
 
-        return {
-          id: user.id,
-          name: user.name,
-          userName: user.userName,
-          email: user.email,
-          status: user.status,
-          role: user.roles.map((r) => {
-            let rol = roles.filter((rol) => rol.id == r.role)[0];
-            return {
-              id: rol.id,
-              role: rol.role,
-            };
-          }),
-          risk: `${risk}%`,
-        };
-      });
+          return {
+            id: user.id,
+            name: user.name,
+            userName: user.userName,
+            email: user.email,
+            status: user.status,
+            role: user.roles.map((r) => {
+              let rol = roles.filter((rol) => rol.id == r.role)[0];
+              return {
+                id: rol.id,
+                role: rol.role,
+                description: rol.description
+              };
+            }),
+            risk: `${risk}%`,
+          };
+        });
 
-      return response;
-    } catch (error: any) {
-      throw new HttpException(error.message, 500);
-    }
-  }
-
-  async getAllRoles() {
-    let data: RoleEntity[] = await this.roleRepository
-      .createQueryBuilder()
-      .select()
-      .getMany();
-
-    return data;
-  }
-
-  async createRole(create: roleDto): Promise<roleDto | null> {
-    try {
-      let role: RoleEntity = new RoleEntity();
-      role.role = create.role!;
-      role.description = create.description!;
-      return await this.roleRepository.save(role);
+        return response;
+      } else {
+        throw new HttpException("users and roles not find", 403);
+      }
     } catch (error: any) {
       throw new HttpException(error.message, 500);
     }
@@ -375,7 +337,7 @@ export class UserService {
       dbUser!.name = user.name;
       dbUser!.userName = user.userName;
       dbUser!.email = user.email;
-      // dbUser!.password = await bcrypt.hash(user.password, 10);
+      dbUser!.password = await bcrypt.hash(user.password, 10);
       dbUser!.pin = user.pin;
 
       await this.userRepository.save(dbUser!);
@@ -395,14 +357,14 @@ export class UserService {
 
   }
 
-  async deleteUser(id: number, admin: string, ip: string){
+  async deleteUser(id: number, admin: string, ip: string) {
 
     try {
-      let user: UserEntity | null = await this.userRepository.findOne({ where: {id: id}});
-      let userAdmin: UserEntity | null = await this.userRepository.findOne({ where: {userName: admin}});
+      let user: UserEntity | null = await this.userRepository.findOne({ where: { id: id } });
+      let userAdmin: UserEntity | null = await this.userRepository.findOne({ where: { userName: admin } });
 
-      if(user){
-        await this.userRepository.delete({id: id});
+      if (user) {
+        await this.userRepository.delete({ id: id });
 
         let log: AuditLogEntity = new AuditLogEntity();
         log.action = "DELETE_USER";
@@ -423,6 +385,99 @@ export class UserService {
 
         await this.auditRepo.save(log);
       }
+    } catch (error: any) {
+      throw new HttpException(error.message, 500);
+    }
+  }
+
+  async blockUser(id: number, admin: string, ip: string) {
+    let user: UserEntity | null = await this.userRepository.findOne({ where: { id: id } });
+    let userAdmin: UserEntity | null = await this.userRepository.findOne({ where: { userName: admin } });
+
+    try {
+      if (user) {
+        user.status = false;
+        await this.userRepository.save(user);
+
+        let log: AuditLogEntity = new AuditLogEntity();
+        log.action = "BLOCK_USER";
+        log.user = userAdmin!;
+        log.description = `se bloqueo al usuario ${user.userName} por el admin ${userAdmin?.userName}`;
+        log.ip = ip;
+        log.success = true;
+
+        await this.auditRepo.save(log);
+
+      } else {
+        let log: AuditLogEntity = new AuditLogEntity();
+        log.action = "BLOCK_USER_FAILED";
+        log.user = userAdmin!;
+        log.description = `usuario no encontrado para eliminar`;
+        log.ip = ip;
+        log.success = false;
+
+        await this.auditRepo.save(log);
+      }
+    } catch (error: any) {
+      throw new HttpException(error.message, 500);
+    }
+  }
+
+  //roles services
+
+  async getAllRoles() {
+    let data: RoleEntity[] = await this.roleRepository
+      .createQueryBuilder()
+      .select()
+      .getMany();
+
+    return data;
+  }
+
+  async createRole(create: roleDto): Promise<roleDto | null> {
+    try {
+      let role: RoleEntity = new RoleEntity();
+      role.role = create.role!;
+      role.description = create.description!;
+      return await this.roleRepository.save(role);
+    } catch (error: any) {
+      throw new HttpException(error.message, 500);
+    }
+  }
+
+  async updateRole(id: number, update: roleDto, ip: string, user: string) {
+    let u = await this.userRepository.findOne({ where: { userName: user } });
+
+    try {
+
+      let role = await this.roleRepository.findOne({ where: { id: id } });
+      if (role) {
+
+        role.role = update.role;
+        role.description = update.description;
+
+        let log: AuditLogEntity = new AuditLogEntity();
+        log.action = "UPDATE_ROLE";
+        log.user = u!;
+        log.description = `Actualizacion de rol`;
+        log.ip = ip;
+        log.success = true;
+
+        await this.roleRepository.save(role);
+        await this.auditRepo.save(log);
+      } else {
+
+        let log: AuditLogEntity = new AuditLogEntity();
+        log.action = "UPDATE_ROLE_FAILED";
+        log.user = u!;
+        log.description = `Actualizacion de rol`;
+        log.ip = ip;
+        log.success = true;
+        await this.auditRepo.save(log);
+
+        throw new HttpException("rol no existe", 403);
+      }
+
     } catch (error: any) {
       throw new HttpException(error.message, 500);
     }

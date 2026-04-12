@@ -1,5 +1,5 @@
 export class roleDto {
     id?: number;
-    role?: string;
-    description?: string;
+    role!: string;
+    description!: string;
 }
