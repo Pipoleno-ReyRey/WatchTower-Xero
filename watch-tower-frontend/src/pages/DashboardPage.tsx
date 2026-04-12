@@ -67,8 +67,8 @@ export const DashboardPage = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="max-h-80 overflow-auto rounded-md border border-border">
-                <Table>
+              <div className="max-h-96 overflow-auto rounded-md border border-border">
+                <Table className="h-full">
                   <TableHeader className="sticky top-0 bg-secondary">
                     <TableRow>
                       <TableHead>Usuario</TableHead>
@@ -79,36 +79,38 @@ export const DashboardPage = () => {
                   </TableHeader>
 
                   <TableBody>
-                    {dashboardQuery.data?.activeUsers.map((user, index) => (
-                      <TableRow
-                        key={index}
-                        className="transition-colors hover:bg-secondary/50"
-                      >
-                        <TableCell className="font-medium">
-                          {user.userName}
-                        </TableCell>
+                    {dashboardQuery.data?.activeUsers
+                      ?.filter((user) => user !== null && user !== undefined)
+                      .map((user, index) => (
+                        <TableRow
+                          key={index}
+                          className="transition-colors hover:bg-secondary/50"
+                        >
+                          <TableCell className="font-medium">
+                            {user?.userName ?? "Sin usuario"}
+                          </TableCell>
 
-                        <TableCell className="text-muted-foreground">
-                          {user.email}
-                        </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {user?.email ?? "Sin email"}
+                          </TableCell>
 
-                        <TableCell>
-                          <Badge
-                            variant="outline"
-                            className="border-primary/50 text-primary"
-                          >
-                            {user.risk}
-                          </Badge>
-                        </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant="outline"
+                              className="border-primary/50 text-primary"
+                            >
+                              {user?.risk ?? "N/A"}
+                            </Badge>
+                          </TableCell>
 
-                        <TableCell>
-                          <span className="inline-flex items-center gap-1.5">
-                            <span className="h-2 w-2 rounded-full bg-primary" />
-                            <span className="text-primary">Activo</span>
-                          </span>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                          <TableCell>
+                            <span className="inline-flex items-center gap-1.5">
+                              <span className="h-2 w-2 rounded-full bg-primary" />
+                              <span className="text-primary">Activo</span>
+                            </span>
+                          </TableCell>
+                        </TableRow>
+                      ))}
                   </TableBody>
                 </Table>
               </div>
@@ -175,7 +177,7 @@ export const DashboardPage = () => {
                             : "outline"
                         }
                       >
-                        {log.action.replace("_", " ")}
+                        {log.description.replace("_", " ")}
                       </Badge>
                     </div>
                     <div className="flex items-center justify-between text-sm text-muted-foreground">

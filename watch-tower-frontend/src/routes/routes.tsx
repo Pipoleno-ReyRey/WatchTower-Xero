@@ -14,6 +14,7 @@ import { RolePage } from "../pages/RolePage";
 // import { NotFoundPage } from "../pages/NotFoundPage";
 import { AuditPage } from "../pages/AuditPage";
 import { UserFormPage } from "../pages/User/UserFormPage";
+import { DocumentFormPage } from "../pages/Document/DocumentFormPage";
 
 export const routes = createBrowserRouter([
   {
@@ -72,7 +73,12 @@ export const routes = createBrowserRouter([
               },
               {
                 path: "create",
-                element: <CreateDocumentPage />,
+                element: <DocumentFormPage />,
+                // element: <CreateDocumentPage />,
+              },
+              {
+                path: "edit/:id",
+                element: <DocumentFormPage />,
               },
               {
                 path: ":id",

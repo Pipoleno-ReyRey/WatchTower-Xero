@@ -42,7 +42,7 @@ export const AuditTable = ({ data }: Props) => {
               <TableHead>Usuario</TableHead>
               <TableHead>Accion</TableHead>
               <TableHead>IP</TableHead>
-              <TableHead>Estado</TableHead>
+              {/* <TableHead>Estado</TableHead> */}
             </TableRow>
           </TableHeader>
 
@@ -57,7 +57,7 @@ export const AuditTable = ({ data }: Props) => {
 
                 <TableCell>{a.userName}</TableCell>
 
-                <TableCell>{a.action}</TableCell>
+                <TableCell>{a.description}</TableCell>
 
                 <TableCell>{a.ip}</TableCell>
                 {/* 

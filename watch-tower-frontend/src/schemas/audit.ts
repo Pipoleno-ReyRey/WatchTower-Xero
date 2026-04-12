@@ -3,4 +3,5 @@ export interface IAudit {
   action: string;
   ip: string;
   date: string;
+  description: string;
 }
