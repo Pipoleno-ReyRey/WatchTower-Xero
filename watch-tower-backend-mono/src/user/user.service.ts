@@ -396,7 +396,7 @@ export class UserService {
 
     try {
       if (user) {
-        user.status = false;
+        user.status = !user.status;
         await this.userRepository.save(user);
 
         let log: AuditLogEntity = new AuditLogEntity();
