@@ -154,6 +154,7 @@ export class DocumentsService {
         doc.title = update.title;
         doc.content = update.content;
         doc.password = update.pass;
+        doc.updatedAt = new Date();
 
         let audit: AuditLogEntity = new AuditLogEntity();
         audit.action = "UPDATE_DOCUMENT";
