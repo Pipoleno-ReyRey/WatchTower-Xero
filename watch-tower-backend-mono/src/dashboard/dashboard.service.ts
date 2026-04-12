@@ -19,7 +19,7 @@ export class DashboardService {
     private async users() {
         try {
             let data = await this.userRepo.createQueryBuilder("user")
-                .leftJoinAndSelect("user.audit", "logs")
+                .innerJoinAndSelect("user.audit", "audit")
                 .getMany();
 
             let activeUsers = data.map(u => {
@@ -27,7 +27,7 @@ export class DashboardService {
                     return {
                         userName: u.userName,
                         email: u.email,
-                        risk: `${u.audit.filter(l => l.action == "LOGIN_FAIL").length * 5}`,
+                        risk: `${u.audit.filter(l => l.action == "LOGIN_FAILED").length * 5}%`,
                         status: u.status
                     } as ActiveUser
                 }
