@@ -7,7 +7,7 @@ import { MainLayout } from "../layout/MainLayout";
 import { ProtectedRoute } from "../routes/ProtectedRoute";
 import { ProtectedAuthRoute } from "./ProtectedAuthRoute ";
 import { DocumentPage } from "../pages/Document/DocumentPage";
-import { CreateDocumentPage } from "../pages/Document/CreateDocumentPage";
+
 import { DocumentDetailPage } from "../pages/Document/DocumentDetailsPage";
 import { RolePage } from "../pages/RolePage";
 

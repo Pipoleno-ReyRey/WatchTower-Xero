@@ -22,12 +22,13 @@ import { formatDate } from "../../utils/formatDate";
 import { useUnlockDocument } from "../../hooks/useUnlockDocument";
 import { getCurrentUser } from "../../lib/axios";
 import { useStore } from "../../store/appStore";
+import Swal from "sweetalert2";
 
 export const DocumentDetailPage = () => {
   const { id } = useParams();
   const setDocument = useStore((state) => state.setDocument);
 
-  const { documentQuery } = useDocument();
+  const { documentQuery, deleteMutation } = useDocument();
   const { keyError, keyInput, setKeyInput, handleUnlock, docData, isLoading } =
     useUnlockDocument(id ? Number(id) : 0);
 
@@ -63,7 +64,28 @@ export const DocumentDetailPage = () => {
                 >
                   Editar
                 </Button>
-                <Button variant="destructive">Eliminar</Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    Swal.fire({
+                      title: "¿Estás seguro?",
+                      text: "¡No podrás revertir esto!",
+                      icon: "warning",
+                      showCancelButton: true,
+                      confirmButtonColor: "#d33",
+                      cancelButtonColor: "#3085d6",
+                      confirmButtonText: "Sí, eliminar",
+                      cancelButtonText: "Cancelar",
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        deleteMutation.mutate(doc.id);
+                        navigate(`..`);
+                      }
+                    });
+                  }}
+                >
+                  Eliminar
+                </Button>
               </div>
             )}
           </div>

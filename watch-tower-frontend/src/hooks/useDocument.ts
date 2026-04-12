@@ -1,5 +1,10 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { createDocument, getAllDocument, updateDocument } from "../services/document-service";
+import {
+  createDocument,
+  deleteDocument,
+  getAllDocument,
+  updateDocument,
+} from "../services/document-service";
 import { queryClient } from "../lib/react-query";
 import type {
   CreateDocumentForm,
@@ -34,10 +39,21 @@ export const useDocument = () => {
     },
   });
 
-  //  title: string;
-  //   content: string;
-  //   hassPass?: boolean | undefined;
-  //   pass?: string | null | undefined;
+ 
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteDocument(id),
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["documents"] });
+      navigate("/documents");
+      toast.success("Documento eliminado correctamente");
+    },
+
+    onError: () => {
+      toast.error("Error al eliminar el documento");
+    },
+  });
+
   const updateDocumentMutation = useMutation({
     mutationFn: (doc: UpdateDocumentForm) => updateDocument(doc),
 
@@ -56,5 +72,7 @@ export const useDocument = () => {
     documentQuery,
     documentMutation,
     updateDocumentMutation,
+    deleteMutation,
+
   };
 };

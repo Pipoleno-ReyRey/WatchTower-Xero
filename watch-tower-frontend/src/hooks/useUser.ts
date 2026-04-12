@@ -4,7 +4,9 @@ import {
   type UseQueryOptions,
 } from "@tanstack/react-query";
 import {
+  blockUserById,
   createuser,
+  deleteUserById,
   getAllUsers,
   getUserById,
   updateUser,
@@ -57,10 +59,39 @@ export const useUser = () => {
     },
   });
 
+  const blockUserMutation = useMutation({
+    mutationFn: (id: number) => blockUserById(id),
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["user"] });
+      navigate("/user");
+      toast.success("Usuario modificado correctamente");
+    },
+
+    onError: () => {
+      toast.error("Error al modificar el usuario");
+    },
+  });
+  const deleteUserMutation = useMutation({
+    mutationFn: (id: number) => deleteUserById(id),
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["user"] });
+      navigate("/user");
+      toast.success("Usuario eliminado correctamente");
+    },
+
+    onError: () => {
+      toast.error("Error al eliminar el usuario");
+    },
+  });
+
   return {
     userQuery,
     useUserByIdQuery,
     createUserMutation,
     updateUserMutation,
+    blockUserMutation,
+    deleteUserMutation,
   };
 };

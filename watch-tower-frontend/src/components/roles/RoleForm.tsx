@@ -25,6 +25,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useStore } from "../../store/appStore";
 import { useRoles } from "../../hooks/useRoles";
 
+
 interface Props {
   data?: Role | null;
   isOpen: boolean;
@@ -32,7 +33,7 @@ interface Props {
 }
 
 export const RoleForm = ({ data, isOpen }: Props) => {
-  const { roleMutation } = useRoles();
+  const { roleMutation, updateRoleMutation } = useRoles();
   const setOpenModalRole = useStore((state) => state.setOpenModalRole);
   const setRole = useStore((state) => state.setRole);
 
@@ -50,10 +51,13 @@ export const RoleForm = ({ data, isOpen }: Props) => {
     if (data?.id) {
       const payload = data?.id ? { ...formData, id: data.id } : formData;
       console.log(payload);
+      updateRoleMutation.mutate({ id: data.id, data: payload });
+      setOpenModalRole(false);
       return;
     }
 
     roleMutation.mutate(formData as CreateRole);
+    setOpenModalRole(false);
   }
   return (
     <Dialog

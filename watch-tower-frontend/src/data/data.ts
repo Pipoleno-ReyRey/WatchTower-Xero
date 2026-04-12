@@ -7,8 +7,8 @@ export const roleOptions = [
 
 export const statusOptions = [
   { label: "Activo", value: "1" },
-  { label: "Inactivo", value: "2" },
-  { label: "Bloqueado", value: "3" },
+  // { label: "Inactivo", value: "2" },
+  { label: "Bloqueado", value: "2" },
 ];
 
 export const dataUsers = [

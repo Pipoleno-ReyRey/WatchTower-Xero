@@ -24,3 +24,11 @@ export const updateUser = async (user: IUserResponse) => {
   const res = await axiosClient.patch<IUserResponse>(`/user/update/`, user);
   return res.data;
 };
+export const blockUserById = async (id: number) => {
+  const res = await axiosClient.put<IUserResponse>(`/user/block/${id}`, {});
+  return res.data;
+};
+export const deleteUserById = async (id: number) => {
+  const res = await axiosClient.delete<IUserResponse>(`/user/${id}`);
+  return res.data;
+};

@@ -19,7 +19,14 @@ export const createDocument = async (doc: CreateDocumentForm) => {
   return res.data;
 };
 export const updateDocument = async (doc: UpdateDocumentForm) => {
-  const res = await axiosClient.put<UpdateDocumentForm>(`/doc/update/${doc.id}`, doc);
+  const res = await axiosClient.put<UpdateDocumentForm>(
+    `/doc/update/${doc.id}`,
+    doc,
+  );
+  return res.data;
+};
+export const deleteDocument = async (id: number) => {
+  const res = await axiosClient.delete(`/doc/delete/${id}`);
   return res.data;
 };
 
