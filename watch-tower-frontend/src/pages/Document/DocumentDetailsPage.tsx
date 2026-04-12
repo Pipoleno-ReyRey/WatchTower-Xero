@@ -16,26 +16,32 @@ import {
 } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDocument } from "../../hooks/useDocument";
 import { formatDate } from "../../utils/formatDate";
 import { useUnlockDocument } from "../../hooks/useUnlockDocument";
+import { getCurrentUser } from "../../lib/axios";
+import { useStore } from "../../store/appStore";
 
 export const DocumentDetailPage = () => {
   const { id } = useParams();
-  const { keyError, keyInput, setKeyInput, handleUnlock, docData, isLoading } =
-    useUnlockDocument();
+  const setDocument = useStore((state) => state.setDocument);
 
   const { documentQuery } = useDocument();
+  const { keyError, keyInput, setKeyInput, handleUnlock, docData, isLoading } =
+    useUnlockDocument(id ? Number(id) : 0);
 
   const doc = documentQuery.data?.find((d) => d.id === Number(id));
+
+  const user = getCurrentUser();
+  const navigate = useNavigate();
 
   if (!doc) return <p>Documento no encontrado</p>;
 
   return (
     <div className="w-full space-y-3">
-      <div className="flex items-center justify-between py-4">
-        <div className="flex flex-col gap-3">
+      <div className=" w-full flex items-center justify-between py-4">
+        <div className="w-full flex flex-col gap-3">
           <Link to={".."}>
             <button className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
               <ArrowLeft className="h-4 w-4" />
@@ -43,8 +49,23 @@ export const DocumentDetailPage = () => {
             </button>
           </Link>
 
-          <div>
+          <div className="w-full flex flex-col gap-2  lg:flex-row lg:items-center justify-between ">
             <h2 className="text-2xl font-bold">{doc.title}</h2>
+
+            {user?.userName === doc.owner && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="default"
+                  onClick={() => {
+                    setDocument(doc);
+                    navigate(`../edit/${doc.id}`);
+                  }}
+                >
+                  Editar
+                </Button>
+                <Button variant="destructive">Eliminar</Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -123,7 +144,7 @@ export const DocumentDetailPage = () => {
                 <Button
                   disabled={isLoading}
                   className="w-full"
-                  onClick={() => handleUnlock(doc.id)}
+                  onClick={() => handleUnlock()}
                 >
                   <Unlock />
                   {isLoading ? "Desbloqueando..." : "Desbloquear"}

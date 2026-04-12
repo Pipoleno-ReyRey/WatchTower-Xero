@@ -3,6 +3,7 @@ import type {
   CreateDocumentForm,
   IDocument,
   UnLockResponse,
+  UpdateDocumentForm,
 } from "../schemas/document";
 
 export const getAllDocument = async () => {
@@ -15,6 +16,10 @@ export const createDocument = async (doc: CreateDocumentForm) => {
     "/doc/new/create",
     doc,
   );
+  return res.data;
+};
+export const updateDocument = async (doc: UpdateDocumentForm) => {
+  const res = await axiosClient.put<UpdateDocumentForm>(`/doc/update/${doc.id}`, doc);
   return res.data;
 };
 

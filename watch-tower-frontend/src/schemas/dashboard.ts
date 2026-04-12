@@ -1,4 +1,4 @@
-import type { IUser } from "./user";
+import type { IUserResumen } from "./user";
 // import type { Role } from "./role";
 
 export interface ILog {
@@ -6,6 +6,7 @@ export interface ILog {
   action: string;
   ip: string;
   date: string; 
+  description: string;
 }
 
 export interface IDashboardRole {
@@ -16,7 +17,7 @@ export interface IDashboardRole {
 export interface IDashboard {
   totalUsers: number;
 
-  activeUsers: IUser[];
+  activeUsers: IUserResumen[];
 
   totalDocuments: number;
 

@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
   createDocumentSchema,
+  updateDocumentSchema,
   type CreateDocumentForm,
   type UpdateDocumentForm,
 } from "../../schemas/document";
@@ -17,41 +18,78 @@ import {
 import { Button } from "../../components/ui/button";
 import { Switch } from "../../components/ui/switch";
 import { Input } from "../../components/ui/input";
+
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
 import { useDocument } from "../../hooks/useDocument";
+import { useStore } from "../../store/appStore";
 
 interface Props {
   document?: UpdateDocumentForm | null;
 }
 
-export const CreateDocumentPage = ({ document }: Props) => {
-  const { documentMutation } = useDocument();
-  const form = useForm<CreateDocumentForm>({
-    resolver: zodResolver(createDocumentSchema),
+export const DocumentForm = ({ document }: Props) => {
+  const { documentMutation, updateDocumentMutation } = useDocument();
+
+  const unlockedContent = useStore(
+    (state) => state.unlockedDocuments[document?.id ?? 0],
+  );
+
+  const isEdit = !!document?.id;
+
+  const form = useForm<CreateDocumentForm | UpdateDocumentForm>({
+    resolver: zodResolver(isEdit ? updateDocumentSchema : createDocumentSchema),
     mode: "onChange",
     defaultValues: {
+      id: document?.id,
       title: document?.title ?? "",
       content: document?.content ?? "",
+      hasPass: document?.hasPass ?? false,
+      owner: document?.owner ?? "currentUser",
     },
   });
+
+  const values = form.getValues();
+
+  const canSubmit = values.title?.length > 0 && values.content?.length > 0;
 
   const hasKey = useWatch({
     control: form.control,
     name: "hasPass",
   });
 
+  // limpiar pass si se desactiva
   useEffect(() => {
     if (!hasKey) {
       form.setValue("pass", "");
     }
   }, [hasKey, form]);
 
-  function onSubmit(data: CreateDocumentForm) {
+  useEffect(() => {
+    if (unlockedContent) {
+      form.setValue("content", unlockedContent, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+  }, [form, unlockedContent]);
+
+  function onSubmit(data: CreateDocumentForm | UpdateDocumentForm) {
     const payload = {
       ...data,
-      pass: data.hasPass && data.pass ? data.pass : undefined,
+      id: "id" in data ? data.id : undefined,
+      owner: document?.owner ?? "currentUser",
+      title: data.title ?? "",
+      content: data.content ?? "",
+      hasPass: data.hasPass ?? false,
+      pass: data.hasPass && "pass" in data && data.pass ? data.pass : undefined,
     };
+
+    if ("id" in data) {
+      console.log("Updating document:", payload);
+      updateDocumentMutation.mutate(payload);
+      return;
+    }
 
     documentMutation.mutate(payload);
   }
@@ -65,15 +103,18 @@ export const CreateDocumentPage = ({ document }: Props) => {
         </button>
       </Link>
 
-      <h1 className="text-xl font-semibold">Crear documento</h1>
+      <h1 className="text-xl font-semibold">
+        {document ? "Editar documento" : "Crear documento"}
+      </h1>
 
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col gap-4 rounded-lg border bg-card p-4 md:p-6"
       >
+        {/* {JSON.stringify(form.formState.errors)} */}
+
         <FieldGroup>
           {/* Nombre */}
-
           <Controller
             name="title"
             control={form.control}
@@ -91,7 +132,6 @@ export const CreateDocumentPage = ({ document }: Props) => {
           />
 
           {/* Contenido */}
-
           <Controller
             name="content"
             control={form.control}
@@ -113,8 +153,7 @@ export const CreateDocumentPage = ({ document }: Props) => {
             )}
           />
 
-          {/* Switch protección */}
-
+          {/* Switch protección (solo crear) */}
           {!document?.id && (
             <Controller
               name="hasPass"
@@ -140,8 +179,7 @@ export const CreateDocumentPage = ({ document }: Props) => {
           )}
 
           {/* Clave */}
-
-          {hasKey && (
+          {hasKey && !document && (
             <Controller
               name="pass"
               control={form.control}
@@ -171,9 +209,9 @@ export const CreateDocumentPage = ({ document }: Props) => {
             Cancelar
           </Button>
 
-          <Button type="submit" disabled={!form.formState.isValid}>
+          <Button type="submit" disabled={!canSubmit}>
             <Save className="mr-2 h-4 w-4" />
-            Guardar documento
+            {document ? "Guardar cambios" : "Crear documento"}
           </Button>
         </div>
       </form>

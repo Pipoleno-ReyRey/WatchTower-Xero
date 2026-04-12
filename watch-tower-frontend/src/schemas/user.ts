@@ -39,12 +39,11 @@ export const userSchema = userCreateSchema
       .min(1)
       .transform((roles) => roles[0]),
   });
-export const userUpdateSchema = userCreateSchema
-  .omit({ password: true })
-  // .extend({
-  //   id: z.number(),
-  //   // password: z.string().min(6).optional(),
-  // });
+export const userUpdateSchema = userCreateSchema.omit({ password: true });
+// .extend({
+//   id: z.number(),
+//   // password: z.string().min(6).optional(),
+// });
 
 export const userResponseSchema = z.object({
   id: z.number(),
@@ -59,7 +58,22 @@ export const userResponseSchema = z.object({
   risk: z.string().optional(),
 });
 
+export const userResumen = userResponseSchema.omit({
+  id: true,
+  role: true,
+  pin: true,
+  name: true,
+});
+
+// {
+//   "userName": "jugonzales",
+//   "email": "jugonzales@gmail.com",
+//   "risk": "0",
+//   "status": true
+// },
+
 export type UpdateUserForm = z.infer<typeof userUpdateSchema>;
 export type IUserForm = z.infer<typeof userCreateSchema>;
 export type IUser = z.infer<typeof userSchema>;
 export type IUserResponse = z.infer<typeof userResponseSchema>;
+export type IUserResumen = z.infer<typeof userResumen>;
