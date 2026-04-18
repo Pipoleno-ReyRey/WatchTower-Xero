@@ -21,9 +21,10 @@ export class UserController {
     }
   }
 
-  @Patch("/change")
-  async changePassword(@Body() data: {password?: string; pin?: string}, @Req() req) {
-    return await this.userService.updateUser(req.info.userName, data.password, data.pin);
+  @Patch("user/change-pass")
+  @UseGuards(AuthGuard)
+  async changePassword(@Body() data: {oldPassword:string, newPassword: string| null; pin: string| null}, @Req() req) {
+    return await this.userService.updateUser(req.info.userName, data.oldPassword, data.newPassword, data.pin, req.ip);
   }
 
   @Post("/sign-in")
