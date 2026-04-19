@@ -27,6 +27,43 @@ export const userCreateSchema = z.object({
     .regex(/^\d+$/, "El PIN solo puede contener números"),
 });
 
+export const userConfigSchema = z
+  .object({
+    name: z
+      .string()
+      .min(3, "El nombre debe tener al menos 3 caracteres")
+      .max(80, "El nombre es demasiado largo")
+      .optional(),
+
+    email: z.string().email("Debe ser un email válido").optional(),
+
+    currentPassword: z.string().min(6).optional(),
+
+    newPassword: z
+      .string()
+      .min(6, "La nueva contraseña debe tener mínimo 6 caracteres")
+      .optional(),
+
+    pin: z
+      .string()
+      .min(4, "El PIN debe tener mínimo 4 dígitos")
+      .max(6, "El PIN no puede tener más de 6 dígitos")
+      .regex(/^\d+$/, "El PIN solo puede contener números")
+      .optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.newPassword && !data.currentPassword) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Debes ingresar la contraseña actual para cambiarla",
+      path: ["currentPassword"],
+    },
+  );
+
 export const userSchema = userCreateSchema
   .omit({ pin: true, password: true })
   .extend({
@@ -40,10 +77,6 @@ export const userSchema = userCreateSchema
       .transform((roles) => roles[0]),
   });
 export const userUpdateSchema = userCreateSchema.omit({ password: true });
-// .extend({
-//   id: z.number(),
-//   // password: z.string().min(6).optional(),
-// });
 
 export const userResponseSchema = z.object({
   id: z.number(),
@@ -65,15 +98,9 @@ export const userResumen = userResponseSchema.omit({
   name: true,
 });
 
-// {
-//   "userName": "jugonzales",
-//   "email": "jugonzales@gmail.com",
-//   "risk": "0",
-//   "status": true
-// },
-
 export type UpdateUserForm = z.infer<typeof userUpdateSchema>;
 export type IUserForm = z.infer<typeof userCreateSchema>;
 export type IUser = z.infer<typeof userSchema>;
+export type IUserConfig = z.infer<typeof userConfigSchema>;
 export type IUserResponse = z.infer<typeof userResponseSchema>;
 export type IUserResumen = z.infer<typeof userResumen>;

@@ -15,6 +15,7 @@ import { RolePage } from "../pages/RolePage";
 import { AuditPage } from "../pages/AuditPage";
 import { UserFormPage } from "../pages/User/UserFormPage";
 import { DocumentFormPage } from "../pages/Document/DocumentFormPage";
+import { ConfigurationPage } from "../pages/ConfigurationPage";
 
 export const routes = createBrowserRouter([
   {
@@ -89,6 +90,15 @@ export const routes = createBrowserRouter([
           {
             path: "audit",
             element: <AuditPage />,
+          },
+          {
+            element: <ProtectedRoute allowedRoles={["admin"]} />,
+            children: [
+              {
+                path: "configuration",
+                element: <ConfigurationPage />,
+              },
+            ],
           },
         ],
       },

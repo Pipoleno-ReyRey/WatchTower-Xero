@@ -25,10 +25,10 @@ export const updateUser = async (user: IUserResponse) => {
   return res.data;
 };
 export const blockUserById = async (id: number) => {
-  const res = await axiosClient.put<IUserResponse>(`/user/block/${id}`, {});
+  const res = await axiosClient.put(`/user/block/${id}`, {});
   return res.data;
 };
 export const deleteUserById = async (id: number) => {
-  const res = await axiosClient.delete<IUserResponse>(`/user/${id}`);
+  const res = await axiosClient.delete(`/user/${id}`);
   return res.data;
 };

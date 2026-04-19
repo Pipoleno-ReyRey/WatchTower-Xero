@@ -1,5 +1,6 @@
 import {
   ClipboardList,
+  Cog,
   FileText,
   LayoutDashboard,
   Shield,
@@ -12,4 +13,5 @@ export const navItems = [
   { path: "user", label: "Usuarios", icon: Users },
   { path: "roles", label: "Roles", icon: Shield },
   { path: "audit", label: "Auditoría", icon: ClipboardList },
+  { path: "configuration", label: "Configuración", icon: Cog },
 ];

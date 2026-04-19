@@ -63,7 +63,7 @@ export const useUser = () => {
     mutationFn: (id: number) => blockUserById(id),
 
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["user"] });
+      await queryClient.invalidateQueries({ queryKey: ["users"] });
       navigate("/user");
       toast.success("Usuario modificado correctamente");
     },
@@ -76,7 +76,7 @@ export const useUser = () => {
     mutationFn: (id: number) => deleteUserById(id),
 
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["user"] });
+      await queryClient.invalidateQueries({ queryKey: ["users"] });
       navigate("/user");
       toast.success("Usuario eliminado correctamente");
     },
