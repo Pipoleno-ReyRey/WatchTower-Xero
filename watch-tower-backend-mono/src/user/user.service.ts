@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { LoginDto } from "core/dtos/login.dto";
 import { roleDto } from "core/dtos/role.dto";
@@ -9,7 +9,7 @@ import { RoleEntity } from "core/entities/role.entity";
 import { SessionEntity } from "core/entities/sessions.entity";
 import { UserEntity } from "core/entities/user.entity";
 import bcrypt from "bcryptjs";
-import { Repository } from "typeorm";
+import { EntityNotFoundError, Repository } from "typeorm";
 import { JwtService } from "@nestjs/jwt";
 import { AuditLogEntity } from "core/entities/audit-logs.entity";
 import { use } from "passport";
@@ -246,49 +246,43 @@ export class UserService {
     }
   }
 
-  async updateUser(user: string, password?: string, pin?: string) {
-    if (password && !pin) {
-      let passCrypt: string = await bcrypt.hash(password, 10);
-      try {
-        await this.userRepository
-          .createQueryBuilder()
-          .update(UserEntity)
-          .set({
-            password: passCrypt,
-          })
-          .where("user_name = :user", { user: user })
-          .execute();
-      } catch (error: any) {
-        throw new HttpException(error.message, 500);
+  async updateUser(user: string, oldPassword: string = "", newPassword: string | null, pin: string | null, ip: string) {
+    try {
+      let u = await this.userRepository.findOne({ where: { userName: user } });
+      if (u) {
+        let correct = await bcrypt.compare(oldPassword!, u!.password);
+        if (correct) {
+          if (newPassword) {
+            u.password = await bcrypt.hash(newPassword, 10);
+          }
+          if (pin) {
+            u.pin = pin;
+          }
+          let audit: AuditLogEntity = new AuditLogEntity();
+          audit.action = "CHANGE_PASSWORD";
+          audit.ip = ip;
+          audit.user = u;
+          audit.description = "Actualizacion de usuario";
+          audit.success = true;
+
+          await this.userRepository.save(u);
+          await this.auditRepo.save(audit);
+        } else {
+          let audit: AuditLogEntity = new AuditLogEntity();
+          audit.action = "CHANGE_PASSWORD";
+          audit.ip = ip;
+          audit.user = u;
+          audit.description = "Actualizacion de usuario";
+          audit.success = false;
+
+          await this.auditRepo.save(audit);
+          throw new UnauthorizedException();
+        }
+      } else {
+        throw new HttpException("user not found", HttpStatus.FORBIDDEN);
       }
-    } else if (pin && !password) {
-      try {
-        await this.userRepository
-          .createQueryBuilder()
-          .update(UserEntity)
-          .set({
-            pin: pin,
-          })
-          .where("user_name = :user", { user: user })
-          .execute();
-      } catch (error: any) {
-        throw new HttpException(error.message, 500);
-      }
-    } else if (pin && password) {
-      let passCrypt: string = await bcrypt.hash(password, 10);
-      try {
-        await this.userRepository
-          .createQueryBuilder()
-          .update(UserEntity)
-          .set({
-            password: passCrypt,
-            pin: pin,
-          })
-          .where("user_name = :user", { user: user })
-          .execute();
-      } catch (error: any) {
-        throw new HttpException(error.message, 500);
-      }
+    } catch (error: any) {
+      throw new HttpException(error.message, 500);
     }
   }
 
