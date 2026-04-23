@@ -94,8 +94,8 @@ export const UserPage = () => {
 
               <CustomSelect
                 placeholder="Estado"
-                onValueChange={(value) => setFilter("status", value)}
                 options={statusOptions}
+                onValueChange={(value) => setFilter("status", value === "true")}
               />
             </div>
           </CardContent>

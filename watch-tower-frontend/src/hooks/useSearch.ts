@@ -20,7 +20,6 @@ export const useSearch = <T extends Record<string, any>>(data?: T[]) => {
     const term = search.toLowerCase();
 
     return data.filter((item) => {
-      // 🔎 búsqueda por texto
       const matchesSearch =
         !term ||
         Object.values(item).some((value) =>
@@ -29,11 +28,22 @@ export const useSearch = <T extends Record<string, any>>(data?: T[]) => {
             .includes(term),
         );
 
-      // 🎯 filtros
       const matchesFilters = Object.entries(filters).every(([key, value]) => {
-        if (!value) return true;
+        if (value === undefined || value === null || value === "") return true;
 
         const itemValue = item[key];
+
+        if (Array.isArray(itemValue)) {
+          return itemValue.some(
+            (v) =>
+              String(v.id) === String(value) ||
+              String(v.role) === String(value),
+          );
+        }
+
+        if (typeof itemValue === "boolean") {
+          return String(itemValue) === String(value);
+        }
 
         return String(itemValue) === String(value);
       });

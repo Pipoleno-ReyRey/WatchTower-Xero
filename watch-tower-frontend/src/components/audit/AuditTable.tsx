@@ -17,6 +17,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "../ui/pagination";
+
 import type { IAudit } from "../../schemas/audit";
 
 interface Props {
@@ -38,81 +39,103 @@ export const AuditTable = ({ data }: Props) => {
     page * pageSize,
   );
 
+  // 🔥 PAGINACIÓN INTELIGENTE
+  const getPages = () => {
+    const pages: (number | string)[] = [];
+
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    pages.push(1);
+
+    if (page > 3) pages.push("...");
+
+    for (let i = page - 1; i <= page + 1; i++) {
+      if (i > 1 && i < totalPages) {
+        pages.push(i);
+      }
+    }
+
+    if (page < totalPages - 2) pages.push("...");
+
+    pages.push(totalPages);
+
+    return pages;
+  };
+
   return (
     <div className="w-full space-y-4">
       {/* TABLE */}
-      <div className="[&>div]:rounded-sm [&>div]:border">
-        <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent">
-              <TableHead>Fecha</TableHead>
-              <TableHead>Usuario</TableHead>
-              <TableHead>Accion</TableHead>
-              <TableHead>IP</TableHead>
-              {/* <TableHead>Estado</TableHead> */}
-            </TableRow>
-          </TableHeader>
-
-          <TableBody>
-            {paginatedData.map((a) => (
-              <TableRow key={a.date}>
-                <TableCell>
-                  <div className="font-medium">
-                    {new Date(a.date).toLocaleDateString("es-DO")}
-                  </div>
-                </TableCell>
-
-                <TableCell>{a.userName}</TableCell>
-
-                <TableCell>{a.description}</TableCell>
-
-                <TableCell>{a.ip}</TableCell>
-                {/* 
-                <TableCell>
-                  <Link to={`${d.id}`}>
-                    <Button size="sm">Ver</Button>
-                  </Link>
-                </TableCell> */}
+      <div className="w-full overflow-x-auto">
+        <div className="[&>div]:rounded-sm [&>div]:border">
+          <Table className="min-w-full table-fixed">
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="w-35">Fecha</TableHead>
+                <TableHead className="w-40">Usuario</TableHead>
+                <TableHead className="w-75">Accion</TableHead>
+                <TableHead className="w-35">IP</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+
+            <TableBody>
+              {paginatedData.map((a) => (
+                <TableRow key={a.date}>
+                  <TableCell className="whitespace-nowrap">
+                    {new Date(a.date).toLocaleDateString("es-DO")}
+                  </TableCell>
+
+                  <TableCell className="whitespace-nowrap">
+                    {a.userName}
+                  </TableCell>
+
+                  <TableCell className="max-w-75 truncate">
+                    {a.description}
+                  </TableCell>
+
+                  <TableCell className="whitespace-nowrap">{a.ip}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
-      <Pagination className="z-10">
+      {/* PAGINATION */}
+      <Pagination className="overflow-x-auto">
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
-              size={"lg"}
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               className={page === 1 ? "pointer-events-none opacity-50" : ""}
+              size={undefined}
             />
           </PaginationItem>
 
-          {Array.from({ length: totalPages }).map((_, i) => {
-            const pageNumber = i + 1;
-
-            return (
-              <PaginationItem key={pageNumber}>
+          {getPages().map((p, i) => (
+            <PaginationItem key={i}>
+              {p === "..." ? (
+                <span className="px-2">...</span>
+              ) : (
                 <PaginationLink
-                  isActive={page === pageNumber}
-                  onClick={() => setPage(pageNumber)}
-                  size={"lg"}
+                  isActive={page === p}
+                  onClick={() => setPage(Number(p))}
+                  size={undefined}
                 >
-                  {pageNumber}
+                  {p}
                 </PaginationLink>
-              </PaginationItem>
-            );
-          })}
+              )}
+            </PaginationItem>
+          ))}
 
-          {/* NEXT */}
           <PaginationItem>
             <PaginationNext
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
               className={
                 page === totalPages ? "pointer-events-none opacity-50" : ""
               }
-              size={"lg"}
+              size={undefined}
             />
           </PaginationItem>
         </PaginationContent>

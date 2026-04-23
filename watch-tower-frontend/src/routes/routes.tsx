@@ -7,15 +7,13 @@ import { MainLayout } from "../layout/MainLayout";
 import { ProtectedRoute } from "../routes/ProtectedRoute";
 import { ProtectedAuthRoute } from "./ProtectedAuthRoute ";
 import { DocumentPage } from "../pages/Document/DocumentPage";
-
 import { DocumentDetailPage } from "../pages/Document/DocumentDetailsPage";
 import { RolePage } from "../pages/RolePage";
-
-// import { NotFoundPage } from "../pages/NotFoundPage";
 import { AuditPage } from "../pages/AuditPage";
 import { UserFormPage } from "../pages/User/UserFormPage";
 import { DocumentFormPage } from "../pages/Document/DocumentFormPage";
 import { ConfigurationPage } from "../pages/ConfigurationPage";
+import { UnauthorizedPage } from "../pages/UnauthorizedPage";
 
 export const routes = createBrowserRouter([
   {
@@ -26,73 +24,40 @@ export const routes = createBrowserRouter([
       { path: "*", element: <Navigate to="/login" replace /> },
     ],
   },
+
   {
+    path: "/",
     element: <ProtectedRoute />,
     children: [
       {
-        path: "/",
         element: <MainLayout />,
         children: [
           {
-            path: "user",
+            index: true,
+            element: <Navigate to="/documents" replace />,
+          },
 
+          {
+            element: (
+              <ProtectedRoute allowedRoles={["admin", "auditor", "user"]} />
+            ),
             children: [
               {
-                index: true,
-                element: <UserPage />,
-              },
-              {
-                path: "create",
-                element: <UserFormPage />,
-              },
-              {
-                path: ":id",
-                element: <UserFormPage />,
+                path: "documents",
+                children: [
+                  { index: true, element: <DocumentPage /> },
+                  { path: "create", element: <DocumentFormPage /> },
+                  { path: "edit/:id", element: <DocumentFormPage /> },
+                  { path: ":id", element: <DocumentDetailPage /> },
+                ],
               },
             ],
           },
-          {
-            path: "roles",
-            element: <RolePage />,
-          },
-          {
-            element: <ProtectedRoute allowedRoles={["admin"]} />,
-            children: [
-              {
-                path: "dashboard",
-                element: <DashboardPage />,
-              },
-            ],
-          },
-          {
-            path: "documents",
 
-            children: [
-              {
-                index: true,
-                element: <DocumentPage />,
-              },
-              {
-                path: "create",
-                element: <DocumentFormPage />,
-                // element: <CreateDocumentPage />,
-              },
-              {
-                path: "edit/:id",
-                element: <DocumentFormPage />,
-              },
-              {
-                path: ":id",
-                element: <DocumentDetailPage />,
-              },
-            ],
-          },
           {
-            path: "audit",
-            element: <AuditPage />,
-          },
-          {
-            element: <ProtectedRoute allowedRoles={["admin"]} />,
+            element: (
+              <ProtectedRoute allowedRoles={["admin", "auditor", "user"]} />
+            ),
             children: [
               {
                 path: "configuration",
@@ -100,11 +65,49 @@ export const routes = createBrowserRouter([
               },
             ],
           },
+
+          {
+            element: <ProtectedRoute allowedRoles={["admin", "auditor"]} />,
+            children: [
+              {
+                path: "user",
+                children: [
+                  { index: true, element: <UserPage /> },
+                  { path: "create", element: <UserFormPage /> },
+                  { path: ":id", element: <UserFormPage /> },
+                ],
+              },
+            ],
+          },
+
+          {
+            element: <ProtectedRoute allowedRoles={["admin", "auditor"]} />,
+            children: [
+              {
+                path: "audit",
+                element: <AuditPage />,
+              },
+            ],
+          },
+
+          {
+            element: <ProtectedRoute allowedRoles={["admin"]} />,
+            children: [
+              {
+                path: "dashboard",
+                element: <DashboardPage />,
+              },
+              {
+                path: "roles",
+                element: <RolePage />,
+              },
+            ],
+          },
         ],
       },
     ],
   },
-  // { path: "/unauthorized", element: <NotFoundPage /> },
 
   { path: "*", element: <Navigate to="/login" replace /> },
+  { path: "unauthorized", element: <UnauthorizedPage /> },
 ]);

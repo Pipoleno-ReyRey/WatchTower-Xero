@@ -14,7 +14,7 @@ export const useAuth = () => {
       console.log(res);
       localStorage.setItem("currentUser", JSON.stringify(res));
       setLoading(false);
-      navigation("/dashboard");
+      navigation("/documents");
       toast.success("Login exitoso");
     } catch (error) {
       toast.error("Error de credenciales");
