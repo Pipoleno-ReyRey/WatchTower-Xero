@@ -29,15 +29,15 @@ export const userCreateSchema = z.object({
 
 export const userConfigSchema = z
   .object({
-    name: z
-      .string()
-      .min(3, "El nombre debe tener al menos 3 caracteres")
-      .max(80, "El nombre es demasiado largo")
-      .optional(),
+    // name: z
+    //   .string()
+    //   .min(3, "El nombre debe tener al menos 3 caracteres")
+    //   .max(80, "El nombre es demasiado largo")
+    //   .optional(),
 
-    email: z.string().email("Debe ser un email válido").optional(),
+    // email: z.string().email("Debe ser un email válido").optional(),
 
-    currentPassword: z.string().min(6).optional(),
+    oldPassword: z.string().min(6).optional(),
 
     newPassword: z
       .string()
@@ -49,11 +49,12 @@ export const userConfigSchema = z
       .min(4, "El PIN debe tener mínimo 4 dígitos")
       .max(6, "El PIN no puede tener más de 6 dígitos")
       .regex(/^\d+$/, "El PIN solo puede contener números")
+      .or(z.literal("")) // 👈 clave
       .optional(),
   })
   .refine(
     (data) => {
-      if (data.newPassword && !data.currentPassword) {
+      if (data.newPassword && !data.oldPassword) {
         return false;
       }
       return true;

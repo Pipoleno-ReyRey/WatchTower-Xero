@@ -29,7 +29,14 @@ export const AuditTable = ({ data }: Props) => {
 
   const totalPages = Math.ceil(data.length / pageSize);
 
-  const paginatedData = data.slice((page - 1) * pageSize, page * pageSize);
+  const sortedData = [...data].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+  );
+
+  const paginatedData = sortedData.slice(
+    (page - 1) * pageSize,
+    page * pageSize,
+  );
 
   return (
     <div className="w-full space-y-4">
@@ -72,8 +79,8 @@ export const AuditTable = ({ data }: Props) => {
         </Table>
       </div>
 
-      <Pagination className="z-10" >
-        <PaginationContent >
+      <Pagination className="z-10">
+        <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
               size={"lg"}

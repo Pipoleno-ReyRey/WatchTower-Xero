@@ -1,6 +1,7 @@
 import { axiosClient } from "../lib/axios";
 import type {
   IUser,
+  IUserConfig,
   IUserForm,
   IUserResponse,
   // UpdateUserForm,
@@ -30,5 +31,10 @@ export const blockUserById = async (id: number) => {
 };
 export const deleteUserById = async (id: number) => {
   const res = await axiosClient.delete(`/user/${id}`);
+  return res.data;
+};
+
+export const changePassword = async (config: IUserConfig) => {
+  const res = await axiosClient.patch("/user/change-pass/", config);
   return res.data;
 };
