@@ -18,6 +18,7 @@ export class AuditService {
             let logs: AuditLogEntity[] = await this.auditRepo
             .createQueryBuilder("audit")
             .innerJoinAndSelect("audit.user", "user")
+            .orderBy("audit.date", "DESC")
             .getMany();
 
             let response: AuditLogDto[] = logs.map(log => {

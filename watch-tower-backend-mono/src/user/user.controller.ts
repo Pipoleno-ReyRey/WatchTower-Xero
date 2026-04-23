@@ -90,7 +90,7 @@ export class UserController {
   @Get("/roles/all")
   @UseGuards(AuthGuard)
   async allRoles(@Req() req): Promise<RoleEntity[]>{
-    if(req.info.role[0].id == 3 || req.info.role[0].id == 1){
+    if(req.info.role[0].id == 1){
       return await this.userService.getAllRoles();
     } else {
       throw new UnauthorizedException();

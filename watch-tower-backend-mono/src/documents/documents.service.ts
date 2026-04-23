@@ -26,6 +26,7 @@ export class DocumentsService {
       let data: DocumentEntity[] = await this.docRepo
         .createQueryBuilder("doc")
         .innerJoinAndSelect("doc.user", "user")
+        .orderBy("doc.updated_at", "DESC")
         .getMany()
 
       if (data) {
